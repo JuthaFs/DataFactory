@@ -20,11 +20,111 @@
 		},
 		"schema": [
 			{
-				"name": "Exrenal Reference",
+				"name": "LearnignUnitCode (Internal CAP)",
 				"type": "String"
 			},
 			{
-				"name": "Field1",
+				"name": "LearningName",
+				"type": "String"
+			},
+			{
+				"name": "TraningId",
+				"type": "String"
+			},
+			{
+				"name": "EventNumberName",
+				"type": "String"
+			},
+			{
+				"name": "LastModifiedDate",
+				"type": "String"
+			},
+			{
+				"name": "TrainingCreatedDate",
+				"type": "String"
+			},
+			{
+				"name": "CreateByName",
+				"type": "String"
+			},
+			{
+				"name": "TrainingContact",
+				"type": "String"
+			},
+			{
+				"name": "TrainingHours",
+				"type": "String"
+			},
+			{
+				"name": "TrainingEmail",
+				"type": "String"
+			},
+			{
+				"name": "Learning10",
+				"type": "String"
+			},
+			{
+				"name": "Learning20",
+				"type": "String"
+			},
+			{
+				"name": "Learning70",
+				"type": "String"
+			},
+			{
+				"name": "TrainingStartDate",
+				"type": "String"
+			},
+			{
+				"name": "TrainingEndDate",
+				"type": "String"
+			},
+			{
+				"name": "EventMinEnroll",
+				"type": "String"
+			},
+			{
+				"name": "EventMaxEnrolment",
+				"type": "String"
+			},
+			{
+				"name": "TrainingObjective",
+				"type": "String"
+			},
+			{
+				"name": "CostName",
+				"type": "String"
+			},
+			{
+				"name": "DemandRequire",
+				"type": "String"
+			},
+			{
+				"name": "PostAssessment",
+				"type": "String"
+			},
+			{
+				"name": "KnowledgeSkill",
+				"type": "String"
+			},
+			{
+				"name": "TrainnerName",
+				"type": "String"
+			},
+			{
+				"name": "InhousePublic",
+				"type": "String"
+			},
+			{
+				"name": "VendorSession",
+				"type": "String"
+			},
+			{
+				"name": "Location",
+				"type": "String"
+			},
+			{
+				"name": "TrainingStatus",
 				"type": "String"
 			}
 		]
