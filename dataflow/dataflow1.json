@@ -1,0 +1,32 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "CSVCustomField",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SQLCustomFieldCatalogue",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "unpivot1"
+				}
+			],
+			"script": "source(output(\n\t\t{Exrenal Reference} as string,\n\t\tField1 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 unpivot(output(\n\t\tCustomFieldName as string,\n\t\tField1 as string\n\t),\n\tungroupBy({Exrenal Reference}),\n\tlateral: true,\n\tignoreNullPivots: true) ~> unpivot1\nunpivot1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tInternalReference as string,\n\t\tCustomFieldName as string,\n\t\tCustomFieldValue as string\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tmapColumn(\n\t\tInternalReference = {Exrenal Reference},\n\t\tCustomFieldName,\n\t\tCustomFieldValue = Field1\n\t)) ~> sink1"
+		}
+	}
+}

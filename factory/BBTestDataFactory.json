@@ -1,0 +1,9 @@
+{
+	"name": "BBTestDataFactory",
+	"location": "southeastasia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "dbaedb80-75c6-4afa-b14d-11947e32c3ae",
+		"tenantId": "37144cf1-077a-473c-b616-4af627592231"
+	}
+}

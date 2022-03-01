@@ -1,0 +1,30 @@
+{
+	"name": "SQLCustomFieldCatalogue",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "PomeloSQL",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "InternalReference",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CustomFieldName",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CustomFieldValue",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "CustoFielsCatalogue"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
