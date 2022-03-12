@@ -1,0 +1,40 @@
+{
+	"name": "CSVDBCustomField",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Input",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Ex_DB_CustomContent.csv",
+				"container": "main"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "LearningUnitCode",
+				"type": "String"
+			},
+			{
+				"name": "LearningUnitName",
+				"type": "String"
+			},
+			{
+				"name": "CustomFieldName",
+				"type": "String"
+			},
+			{
+				"name": "CustomFieldValue",
+				"type": "String"
+			}
+		]
+	}
+}
