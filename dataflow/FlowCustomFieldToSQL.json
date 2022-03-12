@@ -1,5 +1,5 @@
 {
-	"name": "UnpivotCustomFieldToSQL",
+	"name": "FlowCustomFieldToSQL",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
