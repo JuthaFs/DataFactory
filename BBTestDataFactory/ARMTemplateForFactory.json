@@ -1,0 +1,1735 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "BBTestDataFactory"
+		},
+		"Input_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Input'"
+		},
+		"Input2_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Input2'"
+		},
+		"PomeloSQL_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'PomeloSQL'"
+		},
+		"trigger1_properties_CSVToSQL_parameters_filename": {
+			"type": "string",
+			"defaultValue": "@triggerBody().filename"
+		},
+		"trigger1_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/d99b4590-2f3a-42b3-aa04-8c6ffbc7ecf2/resourceGroups/BBTestDataFactory/providers/Microsoft.Storage/storageAccounts/bbtestdatafactory"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/CSVToSQL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Catalogue",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "SqlServerSink",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"InternalReference"
+									]
+								},
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "Internal reference",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "InternalReference",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "External reference",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "ExternalReferance",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Description",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Description",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Content Type",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "ContentType",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Display type",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DisplayType",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Created on",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CreateOn",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Priority",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Priority",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Enrolment mode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "EnrolmentMode",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Enrolment count",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "EnrolmentCount",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CPD learning hours",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CPDLearningHours",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CPD points",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CPDPoints",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Access count",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccessCount",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Rating mean",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "RatingMean",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Rating count",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "RatingCount",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "CSVCatalogue",
+								"type": "DatasetReference",
+								"parameters": {
+									"filename": {
+										"value": "@pipeline().parameters.filename",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "SQLCatalogue",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"filename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-02-24T11:27:05Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/CSVCatalogue')]",
+				"[concat(variables('factoryId'), '/datasets/SQLCatalogue')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomFieldCSVToSQL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "FlowCustomFieldToSQL",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"CustomFieldData": {
+										"Filename": {
+											"value": "@pipeline().parameters.filename",
+											"type": "Expression"
+										}
+									},
+									"source1": {},
+									"sink1": {}
+								},
+								"linkedServiceParameters": {}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"filename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-02-25T03:30:24Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/FlowCustomFieldToSQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CSVCatalogue')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Input",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"filename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().filename",
+							"type": "Expression"
+						},
+						"container": "main"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "Internal reference",
+						"type": "String"
+					},
+					{
+						"name": "External reference",
+						"type": "String"
+					},
+					{
+						"name": "Name",
+						"type": "String"
+					},
+					{
+						"name": "Description",
+						"type": "String"
+					},
+					{
+						"name": "Content Type",
+						"type": "String"
+					},
+					{
+						"name": "Display type",
+						"type": "String"
+					},
+					{
+						"name": "Created on",
+						"type": "String"
+					},
+					{
+						"name": "Priority",
+						"type": "String"
+					},
+					{
+						"name": "Enrolment mode",
+						"type": "String"
+					},
+					{
+						"name": "Enrolment count",
+						"type": "String"
+					},
+					{
+						"name": "CPD learning hours",
+						"type": "String"
+					},
+					{
+						"name": "CPD points",
+						"type": "String"
+					},
+					{
+						"name": "Access count",
+						"type": "String"
+					},
+					{
+						"name": "Rating mean",
+						"type": "String"
+					},
+					{
+						"name": "Rating count",
+						"type": "String"
+					},
+					{
+						"name": "Visibility:phone",
+						"type": "String"
+					},
+					{
+						"name": "Visibility:tablet",
+						"type": "String"
+					},
+					{
+						"name": "Visibility:portal",
+						"type": "String"
+					},
+					{
+						"name": "Category18",
+						"type": "String"
+					},
+					{
+						"name": "Category19",
+						"type": "String"
+					},
+					{
+						"name": "Category20",
+						"type": "String"
+					},
+					{
+						"name": "Category21",
+						"type": "String"
+					},
+					{
+						"name": "Category22",
+						"type": "String"
+					},
+					{
+						"name": "Category23",
+						"type": "String"
+					},
+					{
+						"name": "Category24",
+						"type": "String"
+					},
+					{
+						"name": "Category25",
+						"type": "String"
+					},
+					{
+						"name": "Category26",
+						"type": "String"
+					},
+					{
+						"name": "Category27",
+						"type": "String"
+					},
+					{
+						"name": "Category28",
+						"type": "String"
+					},
+					{
+						"name": "Category29",
+						"type": "String"
+					},
+					{
+						"name": "Category30",
+						"type": "String"
+					},
+					{
+						"name": "Category31",
+						"type": "String"
+					},
+					{
+						"name": "Category32",
+						"type": "String"
+					},
+					{
+						"name": "Category33",
+						"type": "String"
+					},
+					{
+						"name": "Category34",
+						"type": "String"
+					},
+					{
+						"name": "Category35",
+						"type": "String"
+					},
+					{
+						"name": "Category36",
+						"type": "String"
+					},
+					{
+						"name": "Category37",
+						"type": "String"
+					},
+					{
+						"name": "Category38",
+						"type": "String"
+					},
+					{
+						"name": "Category39",
+						"type": "String"
+					},
+					{
+						"name": "Category40",
+						"type": "String"
+					},
+					{
+						"name": "Category41",
+						"type": "String"
+					},
+					{
+						"name": "Category42",
+						"type": "String"
+					},
+					{
+						"name": "Category43",
+						"type": "String"
+					},
+					{
+						"name": "Category44",
+						"type": "String"
+					},
+					{
+						"name": "Category45",
+						"type": "String"
+					},
+					{
+						"name": "Category46",
+						"type": "String"
+					},
+					{
+						"name": "Category47",
+						"type": "String"
+					},
+					{
+						"name": "Category48",
+						"type": "String"
+					},
+					{
+						"name": "Category49",
+						"type": "String"
+					},
+					{
+						"name": "Category50",
+						"type": "String"
+					},
+					{
+						"name": "Category51",
+						"type": "String"
+					},
+					{
+						"name": "Category52",
+						"type": "String"
+					},
+					{
+						"name": "Category53",
+						"type": "String"
+					},
+					{
+						"name": "Category54",
+						"type": "String"
+					},
+					{
+						"name": "Category55",
+						"type": "String"
+					},
+					{
+						"name": "Category56",
+						"type": "String"
+					},
+					{
+						"name": "Category57",
+						"type": "String"
+					},
+					{
+						"name": "Category58",
+						"type": "String"
+					},
+					{
+						"name": "Category59",
+						"type": "String"
+					},
+					{
+						"name": "Category60",
+						"type": "String"
+					},
+					{
+						"name": "Category61",
+						"type": "String"
+					},
+					{
+						"name": "Category62",
+						"type": "String"
+					},
+					{
+						"name": "Category63",
+						"type": "String"
+					},
+					{
+						"name": "Category64",
+						"type": "String"
+					},
+					{
+						"name": "Category65",
+						"type": "String"
+					},
+					{
+						"name": "Category66",
+						"type": "String"
+					},
+					{
+						"name": "Category67",
+						"type": "String"
+					},
+					{
+						"name": "Category68",
+						"type": "String"
+					},
+					{
+						"name": "Category69",
+						"type": "String"
+					},
+					{
+						"name": "Category70",
+						"type": "String"
+					},
+					{
+						"name": "Category71",
+						"type": "String"
+					},
+					{
+						"name": "Category72",
+						"type": "String"
+					},
+					{
+						"name": "Category73",
+						"type": "String"
+					},
+					{
+						"name": "Category74",
+						"type": "String"
+					},
+					{
+						"name": "Category75",
+						"type": "String"
+					},
+					{
+						"name": "Category76",
+						"type": "String"
+					},
+					{
+						"name": "Category77",
+						"type": "String"
+					},
+					{
+						"name": "Category78",
+						"type": "String"
+					},
+					{
+						"name": "Category79",
+						"type": "String"
+					},
+					{
+						"name": "Category80",
+						"type": "String"
+					},
+					{
+						"name": "Category81",
+						"type": "String"
+					},
+					{
+						"name": "Category82",
+						"type": "String"
+					},
+					{
+						"name": "Category83",
+						"type": "String"
+					},
+					{
+						"name": "Category84",
+						"type": "String"
+					},
+					{
+						"name": "Category85",
+						"type": "String"
+					},
+					{
+						"name": "Category86",
+						"type": "String"
+					},
+					{
+						"name": "Category87",
+						"type": "String"
+					},
+					{
+						"name": "Category88",
+						"type": "String"
+					},
+					{
+						"name": "Category89",
+						"type": "String"
+					},
+					{
+						"name": "Category90",
+						"type": "String"
+					},
+					{
+						"name": "Category91",
+						"type": "String"
+					},
+					{
+						"name": "Category92",
+						"type": "String"
+					},
+					{
+						"name": "Category93",
+						"type": "String"
+					},
+					{
+						"name": "Category94",
+						"type": "String"
+					},
+					{
+						"name": "Category95",
+						"type": "String"
+					},
+					{
+						"name": "Category96",
+						"type": "String"
+					},
+					{
+						"name": "Category97",
+						"type": "String"
+					},
+					{
+						"name": "Category98",
+						"type": "String"
+					},
+					{
+						"name": "Category99",
+						"type": "String"
+					},
+					{
+						"name": "Category100",
+						"type": "String"
+					},
+					{
+						"name": "Category101",
+						"type": "String"
+					},
+					{
+						"name": "Category102",
+						"type": "String"
+					},
+					{
+						"name": "Category103",
+						"type": "String"
+					},
+					{
+						"name": "Category104",
+						"type": "String"
+					},
+					{
+						"name": "Category105",
+						"type": "String"
+					},
+					{
+						"name": "Category106",
+						"type": "String"
+					},
+					{
+						"name": "Category107",
+						"type": "String"
+					},
+					{
+						"name": "Category108",
+						"type": "String"
+					},
+					{
+						"name": "Category109",
+						"type": "String"
+					},
+					{
+						"name": "Category110",
+						"type": "String"
+					},
+					{
+						"name": "Category111",
+						"type": "String"
+					},
+					{
+						"name": "Category112",
+						"type": "String"
+					},
+					{
+						"name": "Category113",
+						"type": "String"
+					},
+					{
+						"name": "Category114",
+						"type": "String"
+					},
+					{
+						"name": "Category115",
+						"type": "String"
+					},
+					{
+						"name": "Category116",
+						"type": "String"
+					},
+					{
+						"name": "Category117",
+						"type": "String"
+					},
+					{
+						"name": "Category118",
+						"type": "String"
+					},
+					{
+						"name": "Category119",
+						"type": "String"
+					},
+					{
+						"name": "Category120",
+						"type": "String"
+					},
+					{
+						"name": "Category121",
+						"type": "String"
+					},
+					{
+						"name": "Category122",
+						"type": "String"
+					},
+					{
+						"name": "Category123",
+						"type": "String"
+					},
+					{
+						"name": "Category124",
+						"type": "String"
+					},
+					{
+						"name": "Category125",
+						"type": "String"
+					},
+					{
+						"name": "Category126",
+						"type": "String"
+					},
+					{
+						"name": "Category127",
+						"type": "String"
+					},
+					{
+						"name": "Category128",
+						"type": "String"
+					},
+					{
+						"name": "Category129",
+						"type": "String"
+					},
+					{
+						"name": "Category130",
+						"type": "String"
+					},
+					{
+						"name": "Category131",
+						"type": "String"
+					},
+					{
+						"name": "Category132",
+						"type": "String"
+					},
+					{
+						"name": "Category133",
+						"type": "String"
+					},
+					{
+						"name": "Category134",
+						"type": "String"
+					},
+					{
+						"name": "Category135",
+						"type": "String"
+					},
+					{
+						"name": "Category136",
+						"type": "String"
+					},
+					{
+						"name": "Category137",
+						"type": "String"
+					},
+					{
+						"name": "Category138",
+						"type": "String"
+					},
+					{
+						"name": "Category139",
+						"type": "String"
+					},
+					{
+						"name": "Category140",
+						"type": "String"
+					},
+					{
+						"name": "Category141",
+						"type": "String"
+					},
+					{
+						"name": "Category142",
+						"type": "String"
+					},
+					{
+						"name": "Category143",
+						"type": "String"
+					},
+					{
+						"name": "Category144",
+						"type": "String"
+					},
+					{
+						"name": "Category145",
+						"type": "String"
+					},
+					{
+						"name": "Category146",
+						"type": "String"
+					},
+					{
+						"name": "Category147",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:group148",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:group149",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:group150",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:group151",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:group152",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:group153",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:group154",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:group155",
+						"type": "String"
+					},
+					{
+						"name": "My learning:group156",
+						"type": "String"
+					},
+					{
+						"name": "My learning:group157",
+						"type": "String"
+					},
+					{
+						"name": "My learning:group158",
+						"type": "String"
+					},
+					{
+						"name": "My learning:group159",
+						"type": "String"
+					},
+					{
+						"name": "My learning:group160",
+						"type": "String"
+					},
+					{
+						"name": "My learning:group161",
+						"type": "String"
+					},
+					{
+						"name": "My learning:group162",
+						"type": "String"
+					},
+					{
+						"name": "My learning:group163",
+						"type": "String"
+					},
+					{
+						"name": "My learning:group164",
+						"type": "String"
+					},
+					{
+						"name": "My learning:group165",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)166",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)167",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)168",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)169",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)170",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)171",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)172",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)173",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)174",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)175",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)176",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)177",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)178",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)179",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)180",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)181",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)182",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)183",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)184",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)185",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)186",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)187",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)188",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)189",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)190",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)191",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (english)192",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (local)193",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (local)194",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (local)195",
+						"type": "String"
+					},
+					{
+						"name": "Catalogue:ou:business unit description (local)196",
+						"type": "String"
+					},
+					{
+						"name": "My learning:ou:business unit description (english)197",
+						"type": "String"
+					},
+					{
+						"name": "My learning:ou:business unit description (english)198",
+						"type": "String"
+					},
+					{
+						"name": "My learning:ou:business unit description (english)199",
+						"type": "String"
+					},
+					{
+						"name": "My learning:ou:business unit description (english)200",
+						"type": "String"
+					},
+					{
+						"name": "My learning:ou:business unit description (english)201",
+						"type": "String"
+					},
+					{
+						"name": "My learning:ou:business unit description (english)202",
+						"type": "String"
+					},
+					{
+						"name": "My learning:ou:business unit description (english)203",
+						"type": "String"
+					},
+					{
+						"name": "My learning:ou:business unit description (english)204",
+						"type": "String"
+					},
+					{
+						"name": "My learning:ou:business unit description (english)205",
+						"type": "String"
+					},
+					{
+						"name": "My learning:ou:business unit description (english)206",
+						"type": "String"
+					},
+					{
+						"name": "My learning:ou:business unit description (english)207",
+						"type": "String"
+					},
+					{
+						"name": "My learning:ou:business unit description (english)208",
+						"type": "String"
+					},
+					{
+						"name": "My learning:ou:business unit description (local)",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Input')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CSVCustomField')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Input",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"Filename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": {
+							"value": "@dataset().Filename",
+							"type": "Expression"
+						},
+						"container": "main"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "LearnignUnitCode (Internal CAP)",
+						"type": "String"
+					},
+					{
+						"name": "LearningName",
+						"type": "String"
+					},
+					{
+						"name": "TraningId",
+						"type": "String"
+					},
+					{
+						"name": "EventNumberName",
+						"type": "String"
+					},
+					{
+						"name": "LastModifiedDate",
+						"type": "String"
+					},
+					{
+						"name": "TrainingCreatedDate",
+						"type": "String"
+					},
+					{
+						"name": "CreateByName",
+						"type": "String"
+					},
+					{
+						"name": "TrainingContact",
+						"type": "String"
+					},
+					{
+						"name": "TrainingHours",
+						"type": "String"
+					},
+					{
+						"name": "TrainingEmail",
+						"type": "String"
+					},
+					{
+						"name": "Learning10",
+						"type": "String"
+					},
+					{
+						"name": "Learning20",
+						"type": "String"
+					},
+					{
+						"name": "Learning70",
+						"type": "String"
+					},
+					{
+						"name": "TrainingStartDate",
+						"type": "String"
+					},
+					{
+						"name": "TrainingEndDate",
+						"type": "String"
+					},
+					{
+						"name": "EventMinEnroll",
+						"type": "String"
+					},
+					{
+						"name": "EventMaxEnrolment",
+						"type": "String"
+					},
+					{
+						"name": "TrainingObjective",
+						"type": "String"
+					},
+					{
+						"name": "CostName",
+						"type": "String"
+					},
+					{
+						"name": "DemandRequire",
+						"type": "String"
+					},
+					{
+						"name": "PostAssessment",
+						"type": "String"
+					},
+					{
+						"name": "KnowledgeSkill",
+						"type": "String"
+					},
+					{
+						"name": "TrainnerName",
+						"type": "String"
+					},
+					{
+						"name": "InhousePublic",
+						"type": "String"
+					},
+					{
+						"name": "VendorSession",
+						"type": "String"
+					},
+					{
+						"name": "Location",
+						"type": "String"
+					},
+					{
+						"name": "TrainingStatus",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Input')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CSVDBCustomField')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Input",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "Ex_DB_CustomContent.csv",
+						"container": "main"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "LearningUnitCode",
+						"type": "String"
+					},
+					{
+						"name": "LearningUnitName",
+						"type": "String"
+					},
+					{
+						"name": "CustomFieldName",
+						"type": "String"
+					},
+					{
+						"name": "CustomFieldValue",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Input')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Output')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Input",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "testCustomfield.csv",
+						"container": "main"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Input')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLCatalogue')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "PomeloSQL",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "InternalReference",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ExternalReferance",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Description",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ContentType",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DisplayType",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CreateOn",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Priority",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EnrolmentMode",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EnrolmentCount",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CPDLearningHours",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CPDPoints",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AccessCount",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RatingMean",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RatingCount",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "CatalogueAgylia"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/PomeloSQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SQLCustomFieldCatalogue')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "PomeloSQL",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "InternalReference",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CustomFieldName",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CustomFieldValue",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UpdateDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "CustoFielsCatalogue"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/PomeloSQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Input')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('Input_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Input2')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('Input2_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PomeloSQL')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('PomeloSQL_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger1')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "CSVToSQL",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"filename": "[parameters('trigger1_properties_CSVToSQL_parameters_filename')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/main/blobs/Catalogue",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('trigger1_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/CSVToSQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Managed",
+				"typeProperties": {
+					"computeProperties": {
+						"location": "Southeast Asia",
+						"dataFlowProperties": {
+							"computeType": "General",
+							"coreCount": 8,
+							"timeToLive": 10,
+							"cleanup": false
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FlowCustomFieldToSQL')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "CSVCustomField",
+								"type": "DatasetReference"
+							},
+							"name": "CustomFieldData"
+						},
+						{
+							"dataset": {
+								"referenceName": "SQLCustomFieldCatalogue",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "SQLCustomFieldCatalogue",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "UnpivotCustomFieldNameValuew"
+						},
+						{
+							"name": "AddUpdateDate"
+						},
+						{
+							"name": "AddSignatureNew"
+						},
+						{
+							"name": "AddSignatureExist"
+						},
+						{
+							"name": "FilterNotExist"
+						},
+						{
+							"name": "derivedColumn1"
+						}
+					],
+					"script": "source(output(\n\t\t{LearnignUnitCode (Internal CAP)} as string,\n\t\tLearningName as string,\n\t\tTraningId as string,\n\t\tEventNumberName as string,\n\t\tLastModifiedDate as string,\n\t\tTrainingCreatedDate as string,\n\t\tCreateByName as string,\n\t\tTrainingContact as string,\n\t\tTrainingHours as string,\n\t\tTrainingEmail as string,\n\t\tLearning10 as string,\n\t\tLearning20 as string,\n\t\tLearning70 as string,\n\t\tTrainingStartDate as string,\n\t\tTrainingEndDate as string,\n\t\tEventMinEnroll as string,\n\t\tEventMaxEnrolment as string,\n\t\tTrainingObjective as string,\n\t\tCostName as string,\n\t\tDemandRequire as string,\n\t\tPostAssessment as string,\n\t\tKnowledgeSkill as string,\n\t\tTrainnerName as string,\n\t\tInhousePublic as string,\n\t\tVendorSession as string,\n\t\tLocation as string,\n\t\tTrainingStatus as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> CustomFieldData\nsource(output(\n\t\tInternalReference as string,\n\t\tCustomFieldName as string,\n\t\tCustomFieldValue as string,\n\t\tUpdateDate as timestamp\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1\nCustomFieldData unpivot(output(\n\t\tCustomFieldName as string,\n\t\tCustomFieldValue as string\n\t),\n\tungroupBy({LearnignUnitCode (Internal CAP)},\n\t\tLearningName),\n\tlateral: false,\n\tignoreNullPivots: true) ~> UnpivotCustomFieldNameValuew\nFilterNotExist derive(UpdateDate = toTimestamp(202203011120, 'yyyy-MM-dd HH:mm')\r\n) ~> AddUpdateDate\nUnpivotCustomFieldNameValuew derive(Signature = sha2(256, {LearnignUnitCode (Internal CAP)} ,CustomFieldName,CustomFieldValue)) ~> AddSignatureNew\nsource1 derive(Signature = sha2(256, InternalReference,CustomFieldName,CustomFieldValue)) ~> AddSignatureExist\nderivedColumn1, AddSignatureExist exists(AddSignatureNew@Signature == AddSignatureExist@Signature,\n\tnegate:true,\n\tbroadcast: 'auto')~> FilterNotExist\nAddSignatureNew derive(Date = toTimestamp(concat(substring('CustomField202203051345.csv', 12, 4),'-',substring('CustomField202203051345', 16, 2),'-',substring('CustomField202203051345', 18, 2),' ',substring('CustomField202203051345', 20, 2),':',substring('CustomField202203051345', 22, 2),':'),'yyyy-MM-dd HH:mm')) ~> derivedColumn1\nAddUpdateDate sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tInternalReference as string,\n\t\tCustomFieldName as string,\n\t\tCustomFieldValue as string,\n\t\tUpdateDate as timestamp\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tmapColumn(\n\t\tInternalReference = {LearnignUnitCode (Internal CAP)},\n\t\tCustomFieldName,\n\t\tCustomFieldValue,\n\t\tUpdateDate\n\t)) ~> sink1"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/CSVCustomField')]",
+				"[concat(variables('factoryId'), '/datasets/SQLCustomFieldCatalogue')]"
+			]
+		}
+	]
+}
