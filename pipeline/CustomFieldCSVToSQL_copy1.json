@@ -16,14 +16,8 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "FlowCustomFieldToSQL",
+						"referenceName": "FlowCustomFieldToSQL_copy1",
 						"type": "DataFlowReference",
-						"parameters": {
-							"FileNameDataFlow": {
-								"value": "'@{pipeline().parameters.filename}'",
-								"type": "Expression"
-							}
-						},
 						"datasetParameters": {
 							"CustomFieldData": {
 								"Filename": {
