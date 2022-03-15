@@ -18,6 +18,12 @@
 					"dataflow": {
 						"referenceName": "FlowCustomFieldToSQL",
 						"type": "DataFlowReference",
+						"parameters": {
+							"FileNameDataFlow": {
+								"value": "'@{pipeline().parameters.filename}'",
+								"type": "Expression"
+							}
+						},
 						"datasetParameters": {
 							"CustomFieldData": {
 								"Filename": {
