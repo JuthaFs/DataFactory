@@ -1,0 +1,53 @@
+{
+	"name": "CustomFieldCSVToSQL_copy1",
+	"properties": {
+		"activities": [
+			{
+				"name": "dataflow1",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "1.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "FlowCustomFieldToSQL",
+						"type": "DataFlowReference",
+						"parameters": {
+							"FileNameDataFlow": {
+								"value": "'@{pipeline().parameters.filename}'",
+								"type": "Expression"
+							}
+						},
+						"datasetParameters": {
+							"CustomFieldData": {
+								"Filename": {
+									"value": "@pipeline().parameters.filename",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"parameters": {
+			"filename": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-02-25T03:30:24Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
