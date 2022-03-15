@@ -27,6 +27,11 @@
 				}
 			}
 		],
+		"parameters": {
+			"FileName": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"lastPublishTime": "2022-02-25T03:30:24Z"
 	},
