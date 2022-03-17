@@ -10,7 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "TestCustomfield.csv",
 				"container": "main"
 			},
 			"columnDelimiter": ",",
@@ -18,23 +17,6 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": [
-			{
-				"name": "LearningUnitCode",
-				"type": "String"
-			},
-			{
-				"name": "CustomFieldName",
-				"type": "String"
-			},
-			{
-				"name": "CustomFieldValue",
-				"type": "String"
-			},
-			{
-				"name": "UpdateDate",
-				"type": "String"
-			}
-		]
+		"schema": []
 	}
 }
