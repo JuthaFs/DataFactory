@@ -28,111 +28,843 @@
 		},
 		"schema": [
 			{
-				"name": "LearnignUnitCode (Internal CAP)",
+				"name": "Internal reference",
 				"type": "String"
 			},
 			{
-				"name": "LearningName",
+				"name": "External reference",
 				"type": "String"
 			},
 			{
-				"name": "TraningId",
+				"name": "Name",
 				"type": "String"
 			},
 			{
-				"name": "EventNumberName",
+				"name": "Description",
 				"type": "String"
 			},
 			{
-				"name": "LastModifiedDate",
+				"name": "Content Type",
 				"type": "String"
 			},
 			{
-				"name": "TrainingCreatedDate",
+				"name": "Display type",
 				"type": "String"
 			},
 			{
-				"name": "CreateByName",
+				"name": "Created on",
 				"type": "String"
 			},
 			{
-				"name": "TrainingContact",
+				"name": "Priority",
 				"type": "String"
 			},
 			{
-				"name": "TrainingHours",
+				"name": "Enrolment mode",
 				"type": "String"
 			},
 			{
-				"name": "TrainingEmail",
+				"name": "Enrolment count",
 				"type": "String"
 			},
 			{
-				"name": "Learning10",
+				"name": "CPD learning hours",
 				"type": "String"
 			},
 			{
-				"name": "Learning20",
+				"name": "CPD points",
 				"type": "String"
 			},
 			{
-				"name": "Learning70",
+				"name": "Access count",
 				"type": "String"
 			},
 			{
-				"name": "TrainingStartDate",
+				"name": "Rating mean",
 				"type": "String"
 			},
 			{
-				"name": "TrainingEndDate",
+				"name": "Rating count",
 				"type": "String"
 			},
 			{
-				"name": "EventMinEnroll",
+				"name": "Visibility:phone",
 				"type": "String"
 			},
 			{
-				"name": "EventMaxEnrolment",
+				"name": "Visibility:tablet",
 				"type": "String"
 			},
 			{
-				"name": "TrainingObjective",
+				"name": "Visibility:portal",
 				"type": "String"
 			},
 			{
-				"name": "CostName",
+				"name": "Category",
 				"type": "String"
 			},
 			{
-				"name": "DemandRequire",
+				"name": "Category_1",
 				"type": "String"
 			},
 			{
-				"name": "PostAssessment",
+				"name": "Category_2",
 				"type": "String"
 			},
 			{
-				"name": "KnowledgeSkill",
+				"name": "Category_3",
 				"type": "String"
 			},
 			{
-				"name": "TrainnerName",
+				"name": "Category_4",
 				"type": "String"
 			},
 			{
-				"name": "InhousePublic",
+				"name": "Category_5",
 				"type": "String"
 			},
 			{
-				"name": "VendorSession",
+				"name": "Category_6",
 				"type": "String"
 			},
 			{
-				"name": "Location",
+				"name": "Category_7",
 				"type": "String"
 			},
 			{
-				"name": "TrainingStatus",
+				"name": "Category_8",
+				"type": "String"
+			},
+			{
+				"name": "Category_9",
+				"type": "String"
+			},
+			{
+				"name": "Category_10",
+				"type": "String"
+			},
+			{
+				"name": "Category_11",
+				"type": "String"
+			},
+			{
+				"name": "Category_12",
+				"type": "String"
+			},
+			{
+				"name": "Category_13",
+				"type": "String"
+			},
+			{
+				"name": "Category_14",
+				"type": "String"
+			},
+			{
+				"name": "Category_15",
+				"type": "String"
+			},
+			{
+				"name": "Category_16",
+				"type": "String"
+			},
+			{
+				"name": "Category_17",
+				"type": "String"
+			},
+			{
+				"name": "Category_18",
+				"type": "String"
+			},
+			{
+				"name": "Category_19",
+				"type": "String"
+			},
+			{
+				"name": "Category_20",
+				"type": "String"
+			},
+			{
+				"name": "Category_21",
+				"type": "String"
+			},
+			{
+				"name": "Category_22",
+				"type": "String"
+			},
+			{
+				"name": "Category_23",
+				"type": "String"
+			},
+			{
+				"name": "Category_24",
+				"type": "String"
+			},
+			{
+				"name": "Category_25",
+				"type": "String"
+			},
+			{
+				"name": "Category_26",
+				"type": "String"
+			},
+			{
+				"name": "Category_27",
+				"type": "String"
+			},
+			{
+				"name": "Category_28",
+				"type": "String"
+			},
+			{
+				"name": "Category_29",
+				"type": "String"
+			},
+			{
+				"name": "Category_30",
+				"type": "String"
+			},
+			{
+				"name": "Category_31",
+				"type": "String"
+			},
+			{
+				"name": "Category_32",
+				"type": "String"
+			},
+			{
+				"name": "Category_33",
+				"type": "String"
+			},
+			{
+				"name": "Category_34",
+				"type": "String"
+			},
+			{
+				"name": "Category_35",
+				"type": "String"
+			},
+			{
+				"name": "Category_36",
+				"type": "String"
+			},
+			{
+				"name": "Category_37",
+				"type": "String"
+			},
+			{
+				"name": "Category_38",
+				"type": "String"
+			},
+			{
+				"name": "Category_39",
+				"type": "String"
+			},
+			{
+				"name": "Category_40",
+				"type": "String"
+			},
+			{
+				"name": "Category_41",
+				"type": "String"
+			},
+			{
+				"name": "Category_42",
+				"type": "String"
+			},
+			{
+				"name": "Category_43",
+				"type": "String"
+			},
+			{
+				"name": "Category_44",
+				"type": "String"
+			},
+			{
+				"name": "Category_45",
+				"type": "String"
+			},
+			{
+				"name": "Category_46",
+				"type": "String"
+			},
+			{
+				"name": "Category_47",
+				"type": "String"
+			},
+			{
+				"name": "Category_48",
+				"type": "String"
+			},
+			{
+				"name": "Category_49",
+				"type": "String"
+			},
+			{
+				"name": "Category_50",
+				"type": "String"
+			},
+			{
+				"name": "Category_51",
+				"type": "String"
+			},
+			{
+				"name": "Category_52",
+				"type": "String"
+			},
+			{
+				"name": "Category_53",
+				"type": "String"
+			},
+			{
+				"name": "Category_54",
+				"type": "String"
+			},
+			{
+				"name": "Category_55",
+				"type": "String"
+			},
+			{
+				"name": "Category_56",
+				"type": "String"
+			},
+			{
+				"name": "Category_57",
+				"type": "String"
+			},
+			{
+				"name": "Category_58",
+				"type": "String"
+			},
+			{
+				"name": "Category_59",
+				"type": "String"
+			},
+			{
+				"name": "Category_60",
+				"type": "String"
+			},
+			{
+				"name": "Category_61",
+				"type": "String"
+			},
+			{
+				"name": "Category_62",
+				"type": "String"
+			},
+			{
+				"name": "Category_63",
+				"type": "String"
+			},
+			{
+				"name": "Category_64",
+				"type": "String"
+			},
+			{
+				"name": "Category_65",
+				"type": "String"
+			},
+			{
+				"name": "Category_66",
+				"type": "String"
+			},
+			{
+				"name": "Category_67",
+				"type": "String"
+			},
+			{
+				"name": "Category_68",
+				"type": "String"
+			},
+			{
+				"name": "Category_69",
+				"type": "String"
+			},
+			{
+				"name": "Category_70",
+				"type": "String"
+			},
+			{
+				"name": "Category_71",
+				"type": "String"
+			},
+			{
+				"name": "Category_72",
+				"type": "String"
+			},
+			{
+				"name": "Category_73",
+				"type": "String"
+			},
+			{
+				"name": "Category_74",
+				"type": "String"
+			},
+			{
+				"name": "Category_75",
+				"type": "String"
+			},
+			{
+				"name": "Category_76",
+				"type": "String"
+			},
+			{
+				"name": "Category_77",
+				"type": "String"
+			},
+			{
+				"name": "Category_78",
+				"type": "String"
+			},
+			{
+				"name": "Category_79",
+				"type": "String"
+			},
+			{
+				"name": "Category_80",
+				"type": "String"
+			},
+			{
+				"name": "Category_81",
+				"type": "String"
+			},
+			{
+				"name": "Category_82",
+				"type": "String"
+			},
+			{
+				"name": "Category_83",
+				"type": "String"
+			},
+			{
+				"name": "Category_84",
+				"type": "String"
+			},
+			{
+				"name": "Category_85",
+				"type": "String"
+			},
+			{
+				"name": "Category_86",
+				"type": "String"
+			},
+			{
+				"name": "Category_87",
+				"type": "String"
+			},
+			{
+				"name": "Category_88",
+				"type": "String"
+			},
+			{
+				"name": "Category_89",
+				"type": "String"
+			},
+			{
+				"name": "Category_90",
+				"type": "String"
+			},
+			{
+				"name": "Category_91",
+				"type": "String"
+			},
+			{
+				"name": "Category_92",
+				"type": "String"
+			},
+			{
+				"name": "Category_93",
+				"type": "String"
+			},
+			{
+				"name": "Category_94",
+				"type": "String"
+			},
+			{
+				"name": "Category_95",
+				"type": "String"
+			},
+			{
+				"name": "Category_96",
+				"type": "String"
+			},
+			{
+				"name": "Category_97",
+				"type": "String"
+			},
+			{
+				"name": "Category_98",
+				"type": "String"
+			},
+			{
+				"name": "Category_99",
+				"type": "String"
+			},
+			{
+				"name": "Category_100",
+				"type": "String"
+			},
+			{
+				"name": "Category_101",
+				"type": "String"
+			},
+			{
+				"name": "Category_102",
+				"type": "String"
+			},
+			{
+				"name": "Category_103",
+				"type": "String"
+			},
+			{
+				"name": "Category_104",
+				"type": "String"
+			},
+			{
+				"name": "Category_105",
+				"type": "String"
+			},
+			{
+				"name": "Category_106",
+				"type": "String"
+			},
+			{
+				"name": "Category_107",
+				"type": "String"
+			},
+			{
+				"name": "Category_108",
+				"type": "String"
+			},
+			{
+				"name": "Category_109",
+				"type": "String"
+			},
+			{
+				"name": "Category_110",
+				"type": "String"
+			},
+			{
+				"name": "Category_111",
+				"type": "String"
+			},
+			{
+				"name": "Category_112",
+				"type": "String"
+			},
+			{
+				"name": "Category_113",
+				"type": "String"
+			},
+			{
+				"name": "Category_114",
+				"type": "String"
+			},
+			{
+				"name": "Category_115",
+				"type": "String"
+			},
+			{
+				"name": "Category_116",
+				"type": "String"
+			},
+			{
+				"name": "Category_117",
+				"type": "String"
+			},
+			{
+				"name": "Category_118",
+				"type": "String"
+			},
+			{
+				"name": "Category_119",
+				"type": "String"
+			},
+			{
+				"name": "Category_120",
+				"type": "String"
+			},
+			{
+				"name": "Category_121",
+				"type": "String"
+			},
+			{
+				"name": "Category_122",
+				"type": "String"
+			},
+			{
+				"name": "Category_123",
+				"type": "String"
+			},
+			{
+				"name": "Category_124",
+				"type": "String"
+			},
+			{
+				"name": "Category_125",
+				"type": "String"
+			},
+			{
+				"name": "Category_126",
+				"type": "String"
+			},
+			{
+				"name": "Category_127",
+				"type": "String"
+			},
+			{
+				"name": "Category_128",
+				"type": "String"
+			},
+			{
+				"name": "Category_129",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:group",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:group_130",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:group_131",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:group_132",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:group_133",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:group_134",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:group_135",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:group_136",
+				"type": "String"
+			},
+			{
+				"name": "My learning:group",
+				"type": "String"
+			},
+			{
+				"name": "My learning:group_137",
+				"type": "String"
+			},
+			{
+				"name": "My learning:group_138",
+				"type": "String"
+			},
+			{
+				"name": "My learning:group_139",
+				"type": "String"
+			},
+			{
+				"name": "My learning:group_140",
+				"type": "String"
+			},
+			{
+				"name": "My learning:group_141",
+				"type": "String"
+			},
+			{
+				"name": "My learning:group_142",
+				"type": "String"
+			},
+			{
+				"name": "My learning:group_143",
+				"type": "String"
+			},
+			{
+				"name": "My learning:group_144",
+				"type": "String"
+			},
+			{
+				"name": "My learning:group_145",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_146",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_147",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_148",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_149",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_150",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_151",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_152",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_153",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_154",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_155",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_156",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_157",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_158",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_159",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_160",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_161",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_162",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_163",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_164",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_165",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_166",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_167",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_168",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_169",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_170",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (english)_171",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (local)",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (local)_172",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (local)_173",
+				"type": "String"
+			},
+			{
+				"name": "Catalogue:ou:business unit description (local)_174",
+				"type": "String"
+			},
+			{
+				"name": "My learning:ou:business unit description (english)",
+				"type": "String"
+			},
+			{
+				"name": "My learning:ou:business unit description (english)_175",
+				"type": "String"
+			},
+			{
+				"name": "My learning:ou:business unit description (english)_176",
+				"type": "String"
+			},
+			{
+				"name": "My learning:ou:business unit description (english)_177",
+				"type": "String"
+			},
+			{
+				"name": "My learning:ou:business unit description (english)_178",
+				"type": "String"
+			},
+			{
+				"name": "My learning:ou:business unit description (english)_179",
+				"type": "String"
+			},
+			{
+				"name": "My learning:ou:business unit description (english)_180",
+				"type": "String"
+			},
+			{
+				"name": "My learning:ou:business unit description (english)_181",
+				"type": "String"
+			},
+			{
+				"name": "My learning:ou:business unit description (english)_182",
+				"type": "String"
+			},
+			{
+				"name": "My learning:ou:business unit description (english)_183",
+				"type": "String"
+			},
+			{
+				"name": "My learning:ou:business unit description (english)_184",
+				"type": "String"
+			},
+			{
+				"name": "My learning:ou:business unit description (english)_185",
+				"type": "String"
+			},
+			{
+				"name": "My learning:ou:business unit description (local)",
 				"type": "String"
 			}
 		]
