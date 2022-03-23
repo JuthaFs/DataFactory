@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "dataflow1",
+				"name": "Flowcsv",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
@@ -16,26 +16,17 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "FlowCustomFieldToSQL_copy1",
+						"referenceName": "Flowcsv",
 						"type": "DataFlowReference",
-						"parameters": {
-							"FileNameDataFlow": {
-								"value": "'@{pipeline().parameters.filename}'",
-								"type": "Expression"
-							}
-						},
 						"datasetParameters": {
-							"CustomFieldData": {
-								"Filename": {
-									"value": "@pipeline().parameters.filename",
-									"type": "Expression"
-								}
+							"source1": {
+								"Filename": "@pipeline().parameters.filename"
 							}
 						}
 					},
-					"integrationRuntime": {
-						"referenceName": "integrationRuntime1",
-						"type": "IntegrationRuntimeReference"
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
 					},
 					"traceLevel": "Fine"
 				}
