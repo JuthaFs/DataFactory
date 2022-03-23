@@ -19,7 +19,15 @@
 					"name": "source2"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Output",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
 			"transformations": [
 				{
 					"name": "DeleteOtherColumn"
@@ -525,7 +533,12 @@
 				"filter1 derive(SignatureOld = sha2(256,columns())) ~> derivedColumn2",
 				"AddSinatureNew, derivedColumn2 exists(SignatureNew == SignatureOld,",
 				"     negate:true,",
-				"     broadcast: 'auto')~> exists1"
+				"     broadcast: 'auto')~> exists1",
+				"exists1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     filePattern:(concat('Catalogue-Export', toString(currentTimestamp(), 'yyyyMMddHHmmss'), '.csv')),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
 		}
 	}
