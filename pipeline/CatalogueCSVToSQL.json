@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "Flowcsv",
+						"referenceName": "FlowCategoryToSQL",
 						"type": "DataFlowReference",
 						"parameters": {
 							"Filename": {
