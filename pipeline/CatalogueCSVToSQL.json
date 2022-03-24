@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "FlowCategoryToSQL",
+						"referenceName": "FlowCatalogueToSQL",
 						"type": "DataFlowReference",
 						"parameters": {
 							"Filename": {
