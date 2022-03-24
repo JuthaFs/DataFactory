@@ -45,7 +45,7 @@
 					"name": "AddSinatureNew"
 				},
 				{
-					"name": "derivedColumn2"
+					"name": "AddSignatureOld"
 				},
 				{
 					"name": "exists1"
@@ -507,36 +507,25 @@
 				"     ignoreNoFilesFound: false,",
 				"     multiLineRow: true) ~> source2",
 				"source1 select(mapColumn(",
-				"          each(match(name=='Internal reference'||name=='External reference'||\r",
-				"name=='Name'||name=='Description'||\r",
-				"name=='Description'||name=='Display type'||\r",
-				"name=='Created on'||name=='Priority'||\r",
-				"name=='Created on'||name=='Priority'||\r",
-				"name=='Enrolment mode'||name=='Enrolment count'||\r",
-				"name=='CPD learning hours'||name=='CPD points'||\r",
-				"name=='Access count'||name=='Rating mean'||\r",
-				"name=='Rating count'||name=='Visibility:phone'||\r",
-				"name=='Visibility:tablet'||name=='Visibility:portal'),",
-				"               /* Input name */ $$ = $$)",
+				"          each(match(name=='Internal reference'||name=='External reference'||name=='Name'||name=='Description'||name=='Description'||name=='Display type'||name=='Created on'||name=='Priority'||name=='Created on'||name=='Priority'||name=='Enrolment mode'||name=='Enrolment count'||name=='CPD learning hours'||name=='CPD points'||name=='Access count'||name=='Rating mean'||name=='Rating count'||name=='Visibility:phone'||name=='Visibility:tablet'||name=='Visibility:portal'))",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> DeleteOtherColumn",
 				"source2 select(mapColumn(",
-				"          each(match(name=='Internal reference'||name=='External reference'||name=='Name'||name=='Description'||name=='Description'||name=='Display type'||name=='Created on'||name=='Priority'||name=='Created on'||name=='Priority'||name=='Enrolment mode'||name=='Enrolment count'||name=='CPD learning hours'||name=='CPD points'||name=='Access count'||name=='Rating mean'||name=='Rating count'||name=='Visibility:phone'||name=='Visibility:tablet'||name=='Visibility:portal'),",
-				"               /* Input name */ $$ = $$)",
+				"          each(match(name=='Internal reference'||name=='External reference'||name=='Name'||name=='Description'||name=='Description'||name=='Display type'||name=='Created on'||name=='Priority'||name=='Created on'||name=='Priority'||name=='Enrolment mode'||name=='Enrolment count'||name=='CPD learning hours'||name=='CPD points'||name=='Access count'||name=='Rating mean'||name=='Rating count'||name=='Visibility:phone'||name=='Visibility:tablet'||name=='Visibility:portal'))",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> Select1",
 				"DeleteOtherColumn filter(!isNull({External reference})) ~> ExcludeExtrenalRefNULL",
 				"Select1 filter(!isNull({External reference})) ~> filter1",
 				"ExcludeExtrenalRefNULL derive(SignatureNew = sha2(256,columns())) ~> AddSinatureNew",
-				"filter1 derive(SignatureOld = sha2(256,columns())) ~> derivedColumn2",
-				"AddSinatureNew, derivedColumn2 exists(SignatureNew == SignatureOld,",
+				"filter1 derive(SignatureOld = sha2(256,columns())) ~> AddSignatureOld",
+				"AddSinatureNew, AddSignatureOld exists(SignatureNew == SignatureOld,",
 				"     negate:true,",
 				"     broadcast: 'auto')~> exists1",
 				"exists1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     filePattern:(concat('Catalogue-Export', toString(currentTimestamp(), 'yyyyMMddHHmmss'), '.csv')),",
+				"     filePattern:(concat('Catalogue-Export_', toString(currentTimestamp(), 'yyyyMMddHHmmss'), '.csv')),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> sink1"
 			]
