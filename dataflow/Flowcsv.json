@@ -49,9 +49,15 @@
 				},
 				{
 					"name": "exists1"
+				},
+				{
+					"name": "derivedColumn1"
 				}
 			],
 			"scriptLines": [
+				"parameters{",
+				"     Filename as string",
+				"}",
 				"source(output(",
 				"          {Internal reference} as string,",
 				"          {External reference} as string,",
@@ -66,8 +72,8 @@
 				"          {CPD learning hours} as string,",
 				"          {CPD points} as string,",
 				"          {Access count} as short,",
-				"          {Rating mean} as boolean,",
-				"          {Rating count} as boolean,",
+				"          {Rating mean} as string,",
+				"          {Rating count} as string,",
 				"          {Visibility:phone} as string,",
 				"          {Visibility:tablet} as string,",
 				"          {Visibility:portal} as string,",
@@ -282,8 +288,8 @@
 				"          {CPD learning hours} as string,",
 				"          {CPD points} as string,",
 				"          {Access count} as short,",
-				"          {Rating mean} as boolean,",
-				"          {Rating count} as boolean,",
+				"          {Rating mean} as string,",
+				"          {Rating count} as string,",
 				"          {Visibility:phone} as string,",
 				"          {Visibility:tablet} as string,",
 				"          {Visibility:portal} as string,",
@@ -523,7 +529,9 @@
 				"AddSinatureNew, AddSignatureOld exists(SignatureNew == SignatureOld,",
 				"     negate:true,",
 				"     broadcast: 'auto')~> exists1",
-				"exists1 sink(allowSchemaDrift: true,",
+				"exists1 derive(UpdateDate = currentUTC(),",
+				"          FromFile = toString($Filename)) ~> derivedColumn1",
+				"derivedColumn1 sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     filePattern:(concat('Catalogue-Export_', toString(currentTimestamp(), 'yyyyMMddHHmmss'), '.csv')),",
 				"     skipDuplicateMapInputs: true,",

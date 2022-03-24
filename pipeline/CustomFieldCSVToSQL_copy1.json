@@ -18,6 +18,12 @@
 					"dataflow": {
 						"referenceName": "Flowcsv",
 						"type": "DataFlowReference",
+						"parameters": {
+							"Filename": {
+								"value": "'@{pipeline().parameters.filename}'",
+								"type": "Expression"
+							}
+						},
 						"datasetParameters": {
 							"source1": {
 								"Filename": "@pipeline().parameters.filename"
