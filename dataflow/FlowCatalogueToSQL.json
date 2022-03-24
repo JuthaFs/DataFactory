@@ -1,5 +1,5 @@
 {
-	"name": "FlowCategoryToSQL",
+	"name": "FlowCatalogueToSQL",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
