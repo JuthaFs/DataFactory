@@ -1,0 +1,16 @@
+{
+	"name": "CourseAction",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "TIDB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "PostgreSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "public",
+			"table": "courseActions"
+		}
+	}
+}
