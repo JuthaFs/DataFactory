@@ -10,10 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": {
-					"value": "concat('LearningHistory_', toString(currentTimestamp(), 'yyyyMMddHHmmss'))",
-					"type": "Expression"
-				},
 				"container": "output"
 			},
 			"columnDelimiter": ",",
