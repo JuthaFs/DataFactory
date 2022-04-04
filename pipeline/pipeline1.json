@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "PostgreSqlSource",
-						"query": "select  ca.\"userId\" AS \"STUD_ID\"\n,'E-LEARNING' AS \"CPNT_TYP_ID\"\n,c.sku as  \"CPNT_ID\"\n,'E-LEARNING_COMPLETED' as \"CMPL_STAT_ID\"\n,case when ca.\"updatedAt\" is null then ca.\"createdAt\" else ca.\"updatedAt\" end AS \"COMPL_DTE\"\n,'Asia/Bangkok' as \"COMPL_DTE_TIMEZONE\"\n,c.\"totalTime\"/60/60 as \"CREDIT_HRS\"\n,max(qa.grade) as \"GRADE\"\n,null AS \"INST_NAME\"\n,null AS \"COMMENTS\"\nfrom \"courseActions\" ca \njoin courses c on c.id = ca.\"courseId\"  and c.status = 'published' \njoin topics t  on c.id = t.\"courseId\"  and t.title like 'Question%'\njoin \"quizAttempts\" qa  on qa.\"topicId\" = t.id and qa.\"courseId\" = t.\"courseId\" and qa.\"userId\" = ca.\"userId\" \nwhere ca.\"userId\" = '28a8356f-b393-4c56-9ddb-308c5d6dc78c' and \n--ca.\"cours.Id\" ='a1558712-fe65-4d3c-963c-5154f343a741' and \nca.\"source\" = 'course_completed'\ngroup by (ca.\"userId\", ca.\"updatedAt\" ,ca.\"createdAt\",c.id ,t.id)\norder by ca.\"userId\" asc,c.sku asc\n"
+						"query": "select  ca.\"userId\" AS \"STUD_ID\"\n,'E-LEARNING' AS \"CPNT_TYP_ID\"\n,c.sku as  \"CPNT_ID\"\n,'E-LEARNING_COMPLETED' as \"CMPL_STAT_ID\"\n,case when ca.\"updatedAt\" is null then ca.\"createdAt\" else ca.\"updatedAt\" end AS \"COMPL_DTE\"\n,'Asia/Bangkok' as \"COMPL_DTE_TIMEZONE\"\n,c.\"totalTime\"/60/60 as \"CREDIT_HRS\"\n,max(qa.grade) as \"GRADE\"\n,null AS \"INST_NAME\"\n,null AS \"COMMENTS\"\nfrom \"courseActions\" ca \njoin courses c on c.id = ca.\"courseId\"  and c.status = 'published' \njoin topics t  on c.id = t.\"courseId\"  and t.title like 'Question%'\njoin \"quizAttempts\" qa  on qa.\"topicId\" = t.id and qa.\"courseId\" = t.\"courseId\" and qa.\"userId\" = ca.\"userId\" \nwhere ca.\"userId\" = '28a8356f-b393-4c56-9ddb-308c5d6dc78c' and \n--ca.\"cours.Id\" ='a1558712-fe65-4d3c-963c-5154f343a742' and \nca.\"source\" = 'course_completed'\ngroup by (ca.\"userId\", ca.\"updatedAt\" ,ca.\"createdAt\",c.id ,t.id)\norder by ca.\"userId\" asc,c.sku asc\n"
 					},
 					"sink": {
 						"type": "DelimitedTextSink",
@@ -183,7 +183,7 @@
 				"typeProperties": {
 					"variableName": "CountRow",
 					"value": {
-						"value": "@not(equals(activity('Copy data1').output.rowsRead ,0))",
+						"value": "@not(equals(activity('Copy to internal').output.rowsRead ,0))",
 						"type": "Expression"
 					}
 				}
@@ -223,6 +223,13 @@
 									"referenceName": "Output",
 									"type": "DatasetReference"
 								},
+								"logStorageSettings": {
+									"linkedServiceName": {
+										"referenceName": "Input",
+										"type": "LinkedServiceReference"
+									},
+									"path": "output"
+								},
 								"enableLogging": true,
 								"storeSettings": {
 									"type": "AzureBlobStorageReadSettings",
@@ -254,7 +261,7 @@
 								"url": "https://prod-10.southeastasia.logic.azure.com:443/workflows/cd5050d5a16f498ab6d06f70f7323676/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=68IOE0MD0TSwEJkYKNTkyOpAeHtnejL63-9XOBsFamM",
 								"method": "POST",
 								"body": {
-									"value": "{\n\"message\":\"\"\n}",
+									"value": "{\n\"rowsRead\": \"@{activity('Copy to internal').output.rowsRead}\"\n}",
 									"type": "Expression"
 								}
 							}
