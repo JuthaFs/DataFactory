@@ -252,7 +252,11 @@
 							"userProperties": [],
 							"typeProperties": {
 								"url": "https://prod-10.southeastasia.logic.azure.com:443/workflows/cd5050d5a16f498ab6d06f70f7323676/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=68IOE0MD0TSwEJkYKNTkyOpAeHtnejL63-9XOBsFamM",
-								"method": "POST"
+								"method": "POST",
+								"body": {
+									"value": "{\n\"message\":\"\"\n}",
+									"type": "Expression"
+								}
 							}
 						}
 					]
