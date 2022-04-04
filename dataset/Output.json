@@ -19,6 +19,7 @@
 					"value": "@dataset().Filename",
 					"type": "Expression"
 				},
+				"folderPath": "PTTEP/LearningHistory",
 				"container": "output"
 			},
 			"columnDelimiter": ",",
