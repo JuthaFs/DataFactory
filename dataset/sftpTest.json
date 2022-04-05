@@ -25,6 +25,47 @@
 			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
-		"schema": []
+		"schema": [
+			{
+				"name": "STUD_ID",
+				"type": "String"
+			},
+			{
+				"name": "CPNT_TYP_ID",
+				"type": "String"
+			},
+			{
+				"name": "CPNT_ID",
+				"type": "String"
+			},
+			{
+				"name": "CMPL_STAT_ID",
+				"type": "String"
+			},
+			{
+				"name": "COMPL_DTE",
+				"type": "String"
+			},
+			{
+				"name": "COMPL_DTE_TIMEZONE",
+				"type": "String"
+			},
+			{
+				"name": "CREDIT_HRS",
+				"type": "String"
+			},
+			{
+				"name": "GRADE",
+				"type": "String"
+			},
+			{
+				"name": "INST_NAME",
+				"type": "String"
+			},
+			{
+				"name": "COMMENTS",
+				"type": "String"
+			}
+		]
 	}
 }
