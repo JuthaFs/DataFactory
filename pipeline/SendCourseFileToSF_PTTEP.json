@@ -1,0 +1,219 @@
+{
+	"name": "SendCourseFileToSF_PTTEP",
+	"properties": {
+		"activities": [
+			{
+				"name": "IfCheckHasData",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Set filename",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "queryCheckData",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@not(equals(length(activity('queryCheckData').output.value), 0))",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "sendEmailFail",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": "https://prod-10.southeastasia.logic.azure.com:443/workflows/cd5050d5a16f498ab6d06f70f7323676/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=68IOE0MD0TSwEJkYKNTkyOpAeHtnejL63-9XOBsFamM",
+								"method": "POST",
+								"body": {
+									"value": "{\n\"title\":\"Notify Learning Course\",\n\"message\":\"<p>There are no new versions of </p> <p>@{variables('filename')} uploaded to</p> <p>the SFTP site from BrighterBee.</p> \"\n}",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "sendEmailSuccess",
+							"type": "WebActivity",
+							"dependsOn": [
+								{
+									"activity": "Copy to internal",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": "https://prod-10.southeastasia.logic.azure.com:443/workflows/cd5050d5a16f498ab6d06f70f7323676/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=68IOE0MD0TSwEJkYKNTkyOpAeHtnejL63-9XOBsFamM",
+								"method": "POST",
+								"body": {
+									"value": "{\n\"title\":\"Notify Learning Course\",\n\"message\":\"<p>a new version of</p> <p>@{variables('filename')} with @{activity('Copy to internal').output.rowsRead} record</p> <p>has successfully been uploaded to the SFTP site from BrighterBee.</p>\"\n}",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Copy to internal",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "PostgreSqlSource",
+									"query": {
+										"value": "@variables('query')",
+										"type": "Expression"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "SftpWriteSettings",
+										"operationTimeout": "01:00:00",
+										"useTempFileRename": true
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": {
+											"value": ".csv",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "CourseAction",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "sftpTest",
+									"type": "DatasetReference",
+									"parameters": {
+										"filename": {
+											"value": "@variables('filename')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "Set filename",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "filename",
+					"value": {
+						"value": "@concat('item_data_PTTEP.csv.4')\n\n\n\n",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "queryCheckData",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "Set query",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "PostgreSqlSource",
+						"query": {
+							"value": "@variables('query')",
+							"type": "Expression"
+						}
+					},
+					"dataset": {
+						"referenceName": "CourseAction",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Set query",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "query",
+					"value": {
+						"value": "select * from\n(select c.sku as \"CPNT_ID \" \n,'E-LEARNING' as \"CPNT_TYP_ID\"\n,case when c.\"updatedAt\" is null then c.\"createdAt\" else c.\"updatedAt\" end AS \"REV_DTE\"\n,'1001' as \"DMN_ID\"\n,case when c.status = 'published' then 'N' else 'Y' end as \"NOTACTIVE\"\n,c.title  as \"CPNT_TITLE\"\n,'101_201' as \"SUBJ_AREA_1\"\n,'INTERNAL' as \"CPNT_SRC_ID\"\n,c.\"totalTime\"/60/60 as \"CREDIT_HRS\"\n,null as \"COL_NUM2_VAL\"\n,null as \"LEVEL1_SURVEY\"\nfrom courses c \nwhere   c.sku like '%PTTEP%' and c.status != 'draft'\n) as t1\nwhere t1.\"REV_DTE\" > '@{formatDateTime(addDays(utcnow(), -30) ,'yyyy-MM-dd')}'",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"variables": {
+			"filename": {
+				"type": "String"
+			},
+			"query": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
