@@ -25,14 +25,16 @@
 					"source": {
 						"type": "PostgreSqlSource",
 						"query": {
-							"value": "select * from \n(select  u2.id AS \"STUD_ID\"\n,'E-LEARNING' AS \"CPNT_TYP_ID\"\n,c.sku as  \"CPNT_ID\"\n,'E-LEARNING_COMPLETED' as \"CMPL_STAT_ID\"\n,case when ca.\"updatedAt\" is null then ca.\"createdAt\" else ca.\"updatedAt\" end AS \"COMPL_DTE\"\n,'Asia/Bangkok' as \"COMPL_DTE_TIMEZONE\"\n,c.\"totalTime\"/60/60 as \"CREDIT_HRS\"\n,max(qa.grade) as \"GRADE\"\n,null AS \"INST_NAME\"\n,null AS \"COMMENTS\"\nfrom \"courseActions\" ca \njoin courses c on c.id = ca.\"courseId\"  and c.status = 'published' \njoin topics t  on c.id = t.\"courseId\"  and t.title like 'Question%'\njoin \"quizAttempts\" qa  on qa.\"topicId\" = t.id and qa.\"courseId\" = t.\"courseId\" and qa.\"userId\" = ca.\"userId\" \njoin users u2 on u2.id = ca.\"userId\" \nwhere --ca.\"userId\" = '28a8356f-b393-4c56-9ddb-308c5d6dc78c' and \n--ca.\"cours.Id\" ='a1558712-fe65-4d3c-963c-5154f343a741' and \nca.\"source\" = 'course_completed'\ngroup by (u2.id, ca.\"updatedAt\" ,ca.\"createdAt\",c.id ,t.id)\n--order by ca.\"userId\" asc,c.sku asc\n) t1\nwhere t1.\"COMPL_DTE\" > '@{formatDateTime(addDays(utcnow(), -30) ,'yyyy-MM-dd')}'",
+							"value": "select * from \n(select  u2.id AS \"STUD_ID\"\n,'E-LEARNING' AS \"CPNT_TYP_ID\"\n,c.sku as  \"CPNT_ID\"\n,'E-LEARNING_COMPLETED' as \"CMPL_STAT_ID\"\n,case when ca.\"updatedAt\" is null then ca.\"createdAt\" else ca.\"updatedAt\" end AS \"COMPL_DTE\"\n,'Asia/Bangkok' as \"COMPL_DTE_TIMEZONE\"\n,c.\"totalTime\"/60/60 as \"CREDIT_HRS\"\n,max(qa.grade) as \"GRADE\"\n,null AS \"INST_NAME\"\n,null AS \"COMMENTS\"\nfrom \"courseActions\" ca \njoin courses c on c.id = ca.\"courseId\"  and c.status = 'published' \njoin topics t  on c.id = t.\"courseId\"  and t.title like 'Question%'\njoin \"quizAttempts\" qa  on qa.\"topicId\" = t.id and qa.\"courseId\" = t.\"courseId\" and qa.\"userId\" = ca.\"userId\" \njoin users u2 on u2.id = ca.\"userId\" \nwhere ca.\"userId\" = '28a8356f-b393-4c56-9ddb-308c5d6dc78c' and \n--ca.\"cours.Id\" ='a1558712-fe65-4d3c-963c-5154f343a741' and \nca.\"source\" = 'course_completed'\ngroup by (u2.id, ca.\"updatedAt\" ,ca.\"createdAt\",c.id ,t.id)\n--order by ca.\"userId\" asc,c.sku asc\n) t1\nwhere t1.\"COMPL_DTE\" > '@{formatDateTime(addDays(utcnow(), -10) ,'yyyy-MM-dd')}'",
 							"type": "Expression"
 						}
 					},
 					"sink": {
 						"type": "DelimitedTextSink",
 						"storeSettings": {
-							"type": "AzureBlobStorageWriteSettings"
+							"type": "SftpWriteSettings",
+							"operationTimeout": "01:00:00",
+							"useTempFileRename": true
 						},
 						"formatSettings": {
 							"type": "DelimitedTextWriteSettings",
@@ -53,9 +55,9 @@
 									"type": "Guid"
 								},
 								"sink": {
-									"name": "STUD_ID",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "String",
+									"ordinal": 1
 								}
 							},
 							{
@@ -64,9 +66,9 @@
 									"type": "String"
 								},
 								"sink": {
-									"name": "CPNT_TYP_ID",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "String",
+									"ordinal": 2
 								}
 							},
 							{
@@ -75,9 +77,9 @@
 									"type": "String"
 								},
 								"sink": {
-									"name": "CPNT_ID",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "String",
+									"ordinal": 3
 								}
 							},
 							{
@@ -86,9 +88,9 @@
 									"type": "String"
 								},
 								"sink": {
-									"name": "CMPL_STAT_ID",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "String",
+									"ordinal": 4
 								}
 							},
 							{
@@ -97,9 +99,9 @@
 									"type": "DateTime"
 								},
 								"sink": {
-									"name": "COMPL_DTE",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "String",
+									"ordinal": 5
 								}
 							},
 							{
@@ -108,9 +110,9 @@
 									"type": "String"
 								},
 								"sink": {
-									"name": "COMPL_DTE_TIMEZONE",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "String",
+									"ordinal": 6
 								}
 							},
 							{
@@ -119,9 +121,9 @@
 									"type": "Int32"
 								},
 								"sink": {
-									"name": "CREDIT_HRS",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "String",
+									"ordinal": 7
 								}
 							},
 							{
@@ -130,9 +132,9 @@
 									"type": "Int32"
 								},
 								"sink": {
-									"name": "GRADE",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "String",
+									"ordinal": 8
 								}
 							},
 							{
@@ -141,9 +143,9 @@
 									"type": "String"
 								},
 								"sink": {
-									"name": "INST_NAME",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "String",
+									"ordinal": 9
 								}
 							},
 							{
@@ -152,9 +154,9 @@
 									"type": "String"
 								},
 								"sink": {
-									"name": "COMMENTS",
 									"type": "String",
-									"physicalType": "String"
+									"physicalType": "String",
+									"ordinal": 10
 								}
 							}
 						],
@@ -173,10 +175,10 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "Output",
+						"referenceName": "sftpTest",
 						"type": "DatasetReference",
 						"parameters": {
-							"Filename": {
+							"filename": {
 								"value": "@variables('filename')",
 								"type": "Expression"
 							}
@@ -252,49 +254,13 @@
 			{
 				"name": "Set variable1",
 				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Get Metadata1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "filename",
 					"value": {
-						"value": "@concat('learninghistory_data_PTTEP.csv.',string(add(length(activity('Get Metadata1').output.childItems),1)))\n\n\n\n",
+						"value": "@concat('learninghistory_data_PTTEP.csv.4')\n\n\n\n",
 						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Get Metadata1",
-				"type": "GetMetadata",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "7.00:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"dataset": {
-						"referenceName": "DiretoryPttepLearninghistory",
-						"type": "DatasetReference"
-					},
-					"fieldList": [
-						"childItems"
-					],
-					"storeSettings": {
-						"type": "AzureBlobStorageReadSettings",
-						"enablePartitionDiscovery": false
-					},
-					"formatSettings": {
-						"type": "DelimitedTextReadSettings"
 					}
 				}
 			}
