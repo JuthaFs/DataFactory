@@ -1,5 +1,5 @@
 {
-	"name": "SendFileToSF_PTTEP",
+	"name": "SendLearningHistoryFileToSF_PTTEP",
 	"properties": {
 		"activities": [
 			{
@@ -13,7 +13,7 @@
 						]
 					},
 					{
-						"activity": "queryCheckData",
+						"activity": "qeuryCheckData",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -22,7 +22,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@not(equals(length(activity('queryCheckData').output.value), 0))",
+						"value": "@not(equals(length(activity('Lookup1').output.value), 0))",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
@@ -42,7 +42,7 @@
 								"url": "https://prod-10.southeastasia.logic.azure.com:443/workflows/cd5050d5a16f498ab6d06f70f7323676/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=68IOE0MD0TSwEJkYKNTkyOpAeHtnejL63-9XOBsFamM",
 								"method": "POST",
 								"body": {
-									"value": "{\n\"title\":\"Notify Learning History\",\n\"message\":\"<p>There are no new versions of </p> <p>@{variables('filename')} uploaded to</p> <p>the SFTP site from BrighterBee.</p> \"\n}",
+									"value": "{\n\"message\":\"<p>There are no new versions of </p> <p>@{variables('filename')} uploaded to</p> <p>the SFTP site from BrighterBee.</p> \"\n}",
 									"type": "Expression"
 								}
 							}
@@ -72,7 +72,7 @@
 								"url": "https://prod-10.southeastasia.logic.azure.com:443/workflows/cd5050d5a16f498ab6d06f70f7323676/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=68IOE0MD0TSwEJkYKNTkyOpAeHtnejL63-9XOBsFamM",
 								"method": "POST",
 								"body": {
-									"value": "{\n\"title\":\"Notify Learning History\",\n\"message\":\"<p>a new version of</p> <p>@{variables('filename')} with @{activity('Copy to internal').output.rowsRead} record</p> <p>has successfully been uploaded to the SFTP site from BrighterBee.</p>\"\n}",
+									"value": "{\n\"message\":\"<p>a new version of</p> <p>@{variables('filename')} with @{activity('Copy to internal').output.rowsRead} record</p> <p>has successfully been uploaded to the SFTP site from BrighterBee.</p>\"\n}",
 									"type": "Expression"
 								}
 							}
@@ -271,7 +271,7 @@
 				}
 			},
 			{
-				"name": "queryCheckData",
+				"name": "qeuryCheckData",
 				"type": "Lookup",
 				"dependsOn": [
 					{
