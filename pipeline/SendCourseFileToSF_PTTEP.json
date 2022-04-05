@@ -200,7 +200,7 @@
 				"typeProperties": {
 					"variableName": "query",
 					"value": {
-						"value": "select * from\n(select c.sku as \"CPNT_ID \" \n,'E-LEARNING' as \"CPNT_TYP_ID\"\n,case when c.\"updatedAt\" is null then c.\"createdAt\" else c.\"updatedAt\" end AS \"REV_DTE\"\n,'1001' as \"DMN_ID\"\n,case when c.status = 'published' then 'N' else 'Y' end as \"NOTACTIVE\"\n,c.title  as \"CPNT_TITLE\"\n,'101_201' as \"SUBJ_AREA_1\"\n,'INTERNAL' as \"CPNT_SRC_ID\"\n,c.\"totalTime\"/60/60 as \"CREDIT_HRS\"\n,null as \"COL_NUM2_VAL\"\n,null as \"LEVEL1_SURVEY\"\nfrom courses c \nwhere   c.sku like '%PTTEP%' and c.status != 'draft'\n) as t1\nwhere t1.\"REV_DTE\" > '@{formatDateTime(addDays(utcnow(), -30) ,'yyyy-MM-dd')}'",
+						"value": "select * from\n(select c.sku as \"CPNT_ID \" \n,'E-LEARNING' as \"CPNT_TYP_ID\"\n,case when c.\"updatedAt\" is null then c.\"createdAt\" else c.\"updatedAt\" end AS \"REV_DTE\"\n,'1001' as \"DMN_ID\"\n,case when c.status = 'published' then 'N' else 'Y' end as \"NOTACTIVE\"\n,c.title  as \"CPNT_TITLE\"\n,'101_201' as \"SUBJ_AREA_1\"\n,'INTERNAL' as \"CPNT_SRC_ID\"\n,c.\"totalTime\"/60/60 as \"CREDIT_HRS\"\n,null as \"COL_NUM2_VAL\"\n,null as \"LEVEL1_SURVEY\"\nfrom courses c \nwhere   c.sku like '%PTTEP%' and c.status != 'draft'\n) as t1\nwhere t1.\"REV_DTE\" > '@{formatDateTime(addDays(utcnow(), 1) ,'yyyy-MM-dd')}'",
 						"type": "Expression"
 					}
 				}
