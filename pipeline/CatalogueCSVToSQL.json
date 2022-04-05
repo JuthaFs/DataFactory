@@ -27,6 +27,9 @@
 						"datasetParameters": {
 							"source1": {
 								"Filename": "@pipeline().parameters.filename"
+							},
+							"sink1": {
+								"Filename": "@pipeline().parameters.filename"
 							}
 						}
 					},
