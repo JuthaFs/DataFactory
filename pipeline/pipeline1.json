@@ -5,7 +5,14 @@
 			{
 				"name": "Copy to internal",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Set variable1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "7.00:00:00",
 					"retry": 0,
@@ -17,7 +24,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "PostgreSqlSource",
-						"query": "select  ca.\"userId\" AS \"STUD_ID\"\n,'E-LEARNING' AS \"CPNT_TYP_ID\"\n,c.sku as  \"CPNT_ID\"\n,'E-LEARNING_COMPLETED' as \"CMPL_STAT_ID\"\n,case when ca.\"updatedAt\" is null then ca.\"createdAt\" else ca.\"updatedAt\" end AS \"COMPL_DTE\"\n,'Asia/Bangkok' as \"COMPL_DTE_TIMEZONE\"\n,c.\"totalTime\"/60/60 as \"CREDIT_HRS\"\n,max(qa.grade) as \"GRADE\"\n,null AS \"INST_NAME\"\n,null AS \"COMMENTS\"\nfrom \"courseActions\" ca \njoin courses c on c.id = ca.\"courseId\"  and c.status = 'published' \njoin topics t  on c.id = t.\"courseId\"  and t.title like 'Question%'\njoin \"quizAttempts\" qa  on qa.\"topicId\" = t.id and qa.\"courseId\" = t.\"courseId\" and qa.\"userId\" = ca.\"userId\" \nwhere ca.\"userId\" = '28a8356f-b393-4c56-9ddb-308c5d6dc78c' and \n--ca.\"cours.Id\" ='a1558712-fe65-4d3c-963c-5154f343a742' and \nca.\"source\" = 'course_completed'\ngroup by (ca.\"userId\", ca.\"updatedAt\" ,ca.\"createdAt\",c.id ,t.id)\norder by ca.\"userId\" asc,c.sku asc\n"
+						"query": {
+							"value": "select * from \n(select  u2.id AS \"STUD_ID\"\n,'E-LEARNING' AS \"CPNT_TYP_ID\"\n,c.sku as  \"CPNT_ID\"\n,'E-LEARNING_COMPLETED' as \"CMPL_STAT_ID\"\n,case when ca.\"updatedAt\" is null then ca.\"createdAt\" else ca.\"updatedAt\" end AS \"COMPL_DTE\"\n,'Asia/Bangkok' as \"COMPL_DTE_TIMEZONE\"\n,c.\"totalTime\"/60/60 as \"CREDIT_HRS\"\n,max(qa.grade) as \"GRADE\"\n,null AS \"INST_NAME\"\n,null AS \"COMMENTS\"\nfrom \"courseActions\" ca \njoin courses c on c.id = ca.\"courseId\"  and c.status = 'published' \njoin topics t  on c.id = t.\"courseId\"  and t.title like 'Question%'\njoin \"quizAttempts\" qa  on qa.\"topicId\" = t.id and qa.\"courseId\" = t.\"courseId\" and qa.\"userId\" = ca.\"userId\" \njoin users u2 on u2.id = ca.\"userId\" \nwhere --ca.\"userId\" = '28a8356f-b393-4c56-9ddb-308c5d6dc78c' and \n--ca.\"cours.Id\" ='a1558712-fe65-4d3c-963c-5154f343a741' and \nca.\"source\" = 'course_completed'\ngroup by (u2.id, ca.\"updatedAt\" ,ca.\"createdAt\",c.id ,t.id)\n--order by ca.\"userId\" asc,c.sku asc\n) t1\nwhere t1.\"COMPL_DTE\" > '@{formatDateTime(addDays(utcnow(), -30) ,'yyyy-MM-dd')}'",
+							"type": "Expression"
+						}
 					},
 					"sink": {
 						"type": "DelimitedTextSink",
@@ -164,13 +174,19 @@
 				"outputs": [
 					{
 						"referenceName": "Output",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"Filename": {
+								"value": "@variables('filename')",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			},
 			{
-				"name": "Set countRow",
-				"type": "SetVariable",
+				"name": "If Condition1",
+				"type": "IfCondition",
 				"dependsOn": [
 					{
 						"activity": "Copy to internal",
@@ -181,34 +197,14 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "CountRow",
-					"value": {
-						"value": "@not(equals(activity('Copy to internal').output.rowsRead ,0))",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "If Condition1",
-				"type": "IfCondition",
-				"dependsOn": [
-					{
-						"activity": "Set countRow",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
 					"expression": {
-						"value": "@variables('CountRow')",
+						"value": "@not(equals(activity('Copy to internal').output.rowsRead, 0))",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
 						{
-							"name": "Delete1",
-							"type": "Delete",
+							"name": "Web1_copy1",
+							"type": "WebActivity",
 							"dependsOn": [],
 							"policy": {
 								"timeout": "7.00:00:00",
@@ -219,27 +215,11 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"dataset": {
-									"referenceName": "Output",
-									"type": "DatasetReference"
-								},
-								"logStorageSettings": {
-									"linkedServiceName": {
-										"referenceName": "Input",
-										"type": "LinkedServiceReference"
-									},
-									"path": "output"
-								},
-								"enableLogging": true,
-								"storeSettings": {
-									"type": "AzureBlobStorageReadSettings",
-									"recursive": true,
-									"modifiedDatetimeStart": {
-										"value": "@adddays(utcnow(),-1)",
-										"type": "Expression"
-									},
-									"enablePartitionDiscovery": false,
-									"prefix": "data_"
+								"url": "https://prod-10.southeastasia.logic.azure.com:443/workflows/cd5050d5a16f498ab6d06f70f7323676/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=68IOE0MD0TSwEJkYKNTkyOpAeHtnejL63-9XOBsFamM",
+								"method": "POST",
+								"body": {
+									"value": "{\n\"rowsRead\": \"\",\n\"filename\": \"\",\n\"message\":\"<p>There are no new versions of </p> <p>@{variables('filename')} uploaded to</p> <p>the SFTP site from BrighterBee.\n</p> \"\n}",
+									"type": "Expression"
 								}
 							}
 						}
@@ -261,19 +241,74 @@
 								"url": "https://prod-10.southeastasia.logic.azure.com:443/workflows/cd5050d5a16f498ab6d06f70f7323676/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=68IOE0MD0TSwEJkYKNTkyOpAeHtnejL63-9XOBsFamM",
 								"method": "POST",
 								"body": {
-									"value": "{\n\"rowsRead\": \"@{activity('Copy to internal').output.rowsRead}\"\n}",
+									"value": "{\n\"rowsRead\": \"@{activity('Copy to internal').output.rowsRead}\",\n\"filename\": \"@{variables('filename')}\",\n\"message\":\"<p>a new version of</p> <p>@{variables('filename')} with @{activity('Copy to internal').output.rowsRead} record</p> <p>has successfully been uploaded to the SFTP site from BrighterBee.</p>\"\n}",
 									"type": "Expression"
 								}
 							}
 						}
 					]
 				}
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "filename",
+					"value": {
+						"value": "@concat('learninghistory_data_PTTEP.csv.',string(add(length(activity('Get Metadata1').output.childItems),1)))\n\n\n\n",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Get Metadata1",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DiretoryPttepLearninghistory",
+						"type": "DatasetReference"
+					},
+					"fieldList": [
+						"childItems"
+					],
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
 			}
 		],
 		"variables": {
-			"CountRow": {
+			"hasData": {
 				"type": "Boolean",
 				"defaultValue": false
+			},
+			"filename": {
+				"type": "String"
+			},
+			"query": {
+				"type": "String"
 			}
 		},
 		"annotations": []
