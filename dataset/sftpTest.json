@@ -21,8 +21,8 @@
 				}
 			},
 			"columnDelimiter": ",",
-			"escapeChar": "\\",
-			"firstRowAsHeader": false,
+			"escapeChar": "\"",
+			"firstRowAsHeader": true,
 			"quoteChar": "\""
 		},
 		"schema": []
