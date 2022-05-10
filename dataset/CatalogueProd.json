@@ -1,0 +1,77 @@
+{
+	"name": "CatalogueProd",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SqlProd",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "InternalReference",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ExternalReferance",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Description",
+				"type": "nvarchar"
+			},
+			{
+				"name": "ContentType",
+				"type": "nvarchar"
+			},
+			{
+				"name": "DisplayType",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CreateOn",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Priority",
+				"type": "nvarchar"
+			},
+			{
+				"name": "EnrolmentMode",
+				"type": "nvarchar"
+			},
+			{
+				"name": "EnrolmentCount",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CPDLearningHours",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CPDPoints",
+				"type": "nvarchar"
+			},
+			{
+				"name": "AccessCount",
+				"type": "nvarchar"
+			},
+			{
+				"name": "RatingMean",
+				"type": "nvarchar"
+			},
+			{
+				"name": "RatingCount",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "CatalogueAgylia"
+		}
+	}
+}
