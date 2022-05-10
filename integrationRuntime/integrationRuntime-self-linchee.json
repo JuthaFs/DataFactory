@@ -1,0 +1,6 @@
+{
+	"name": "integrationRuntime-self-linchee",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}
