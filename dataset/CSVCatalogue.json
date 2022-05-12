@@ -2,13 +2,16 @@
 	"name": "CSVCatalogue",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "Input",
+			"referenceName": "ContainerSFTP",
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
 			"filename": {
 				"type": "string"
 			}
+		},
+		"folder": {
+			"name": "CBM-AGY/Catalogue"
 		},
 		"annotations": [],
 		"type": "DelimitedText",
@@ -19,6 +22,7 @@
 					"value": "@dataset().filename",
 					"type": "Expression"
 				},
+				"folderPath": "testsftp",
 				"container": "main"
 			},
 			"columnDelimiter": ",",

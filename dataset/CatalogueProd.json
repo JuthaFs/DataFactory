@@ -5,6 +5,9 @@
 			"referenceName": "SqlProd",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "CBM-AGY/Catalogue"
+		},
 		"annotations": [],
 		"type": "SqlServerTable",
 		"schema": [
@@ -66,6 +69,16 @@
 			},
 			{
 				"name": "RatingCount",
+				"type": "nvarchar"
+			},
+			{
+				"name": "UpdateDate",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			},
+			{
+				"name": "FromFile",
 				"type": "nvarchar"
 			}
 		],

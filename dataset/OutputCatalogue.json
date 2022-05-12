@@ -1,0 +1,96 @@
+{
+	"name": "OutputCatalogue",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Input",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "CBM-AGY"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "Catalogue_Temp.csv",
+				"folderPath": "temp_catalogue",
+				"container": "main"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\"",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Internal reference",
+				"type": "String"
+			},
+			{
+				"name": "External reference",
+				"type": "String"
+			},
+			{
+				"name": "Name",
+				"type": "String"
+			},
+			{
+				"name": "Description",
+				"type": "String"
+			},
+			{
+				"name": "Content Type",
+				"type": "String"
+			},
+			{
+				"name": "Display type",
+				"type": "String"
+			},
+			{
+				"name": "Created on",
+				"type": "String"
+			},
+			{
+				"name": "Priority",
+				"type": "String"
+			},
+			{
+				"name": "Enrolment mode",
+				"type": "String"
+			},
+			{
+				"name": "Enrolment count",
+				"type": "String"
+			},
+			{
+				"name": "CPD learning hours",
+				"type": "String"
+			},
+			{
+				"name": "CPD points",
+				"type": "String"
+			},
+			{
+				"name": "Access count",
+				"type": "String"
+			},
+			{
+				"name": "Rating mean",
+				"type": "String"
+			},
+			{
+				"name": "Rating count",
+				"type": "String"
+			},
+			{
+				"name": "UpdateDate",
+				"type": "String"
+			},
+			{
+				"name": "FromFile",
+				"type": "String"
+			}
+		]
+	}
+}
