@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "BBTestDataFactory"
 		},
+		"ContainerSFTP_connectionString": {
+			"value": ""
+		},
 		"Input_connectionString": {
 			"value": ""
 		},
@@ -14,10 +17,34 @@
 		"PomeloSQL_connectionString": {
 			"value": ""
 		},
-		"trigger1_properties_CSVToSQL_parameters_filename": {
+		"Sftp1_password": {
+			"value": ""
+		},
+		"SqlProd_connectionString": {
+			"value": ""
+		},
+		"TIDB_connectionString": {
+			"value": ""
+		},
+		"Sftp1_properties_typeProperties_host": {
+			"value": "foreducation.files.com"
+		},
+		"Sftp1_properties_typeProperties_userName": {
+			"value": "jutha"
+		},
+		"Auto-onCreate_properties_CSVToSQL_parameters_filename": {
 			"value": "@triggerBody().filename"
 		},
-		"trigger1_properties_typeProperties_scope": {
+		"Auto-onCreate_properties_CatalogueCSVToSQL_parameters_filename": {
+			"value": "@triggerBody().filename"
+		},
+		"Auto-onCreate_properties_typeProperties_scope": {
+			"value": "/subscriptions/d99b4590-2f3a-42b3-aa04-8c6ffbc7ecf2/resourceGroups/BBTestDataFactory/providers/Microsoft.Storage/storageAccounts/bbtestdatafactory2"
+		},
+		"trigger2_properties_CustomFieldCSVToSQL_parameters_filename": {
+			"value": "@triggerBody().filename"
+		},
+		"trigger2_properties_typeProperties_scope": {
 			"value": "/subscriptions/d99b4590-2f3a-42b3-aa04-8c6ffbc7ecf2/resourceGroups/BBTestDataFactory/providers/Microsoft.Storage/storageAccounts/bbtestdatafactory"
 		}
 	}

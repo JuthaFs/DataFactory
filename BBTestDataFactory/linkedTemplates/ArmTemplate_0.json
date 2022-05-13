@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "BBTestDataFactory"
 		},
+		"ContainerSFTP_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'ContainerSFTP'"
+		},
 		"Input_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Input'"
@@ -19,19 +23,44 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'PomeloSQL'"
 		},
-		"trigger1_properties_CSVToSQL_parameters_filename": {
-			"type": "string",
-			"defaultValue": "@triggerBody().filename"
+		"Sftp1_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Sftp1'"
 		},
-		"trigger1_properties_typeProperties_scope": {
+		"TIDB_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'TIDB'"
+		},
+		"SqlProd_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'SqlProd'"
+		},
+		"Sftp1_properties_typeProperties_host": {
 			"type": "string",
-			"defaultValue": "/subscriptions/d99b4590-2f3a-42b3-aa04-8c6ffbc7ecf2/resourceGroups/BBTestDataFactory/providers/Microsoft.Storage/storageAccounts/bbtestdatafactory"
+			"defaultValue": "foreducation.files.com"
+		},
+		"Sftp1_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "jutha"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ContainerSFTP')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"connectionString": "[parameters('ContainerSFTP_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Input')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -72,6 +101,50 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Sftp1')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "Sftp",
+				"typeProperties": {
+					"host": "[parameters('Sftp1_properties_typeProperties_host')]",
+					"port": 22,
+					"skipHostKeyValidation": true,
+					"authenticationType": "Basic",
+					"userName": "[parameters('Sftp1_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('Sftp1_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/TIDB')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "PostgreSql",
+				"typeProperties": {
+					"connectionString": "[parameters('TIDB_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/integrationRuntime-self-linchee')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/integrationRuntime1')]",
 			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
 			"apiVersion": "2018-06-01",
@@ -97,13 +170,16 @@
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "Input",
+					"referenceName": "ContainerSFTP",
 					"type": "LinkedServiceReference"
 				},
 				"parameters": {
 					"filename": {
 						"type": "string"
 					}
+				},
+				"folder": {
+					"name": "CBM-AGY/Catalogue"
 				},
 				"annotations": [],
 				"type": "DelimitedText",
@@ -114,6 +190,7 @@
 							"value": "@dataset().filename",
 							"type": "Expression"
 						},
+						"folderPath": "testsftp",
 						"container": "main"
 					},
 					"columnDelimiter": ",",
@@ -965,6 +1042,731 @@
 				]
 			},
 			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ContainerSFTP')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CSVChange')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Input",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "CatalogueExport_20220223111707593.csv",
+						"container": "main"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					},
+					{
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Input')]"
 			]
 		},
@@ -1159,6 +1961,27 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/CourseAction')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "TIDB",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "PostgreSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "public",
+					"table": "courseActions"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/TIDB')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Output')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1167,20 +1990,130 @@
 					"referenceName": "Input",
 					"type": "LinkedServiceReference"
 				},
+				"parameters": {
+					"Filename": {
+						"type": "string"
+					}
+				},
 				"annotations": [],
 				"type": "DelimitedText",
 				"typeProperties": {
 					"location": {
 						"type": "AzureBlobStorageLocation",
-						"fileName": "testCustomfield.csv",
-						"container": "main"
+						"fileName": {
+							"value": "@dataset().Filename",
+							"type": "Expression"
+						},
+						"folderPath": "PTTEP/LearningHistory",
+						"container": "output"
 					},
 					"columnDelimiter": ",",
-					"escapeChar": "\\",
+					"escapeChar": "\"",
 					"firstRowAsHeader": true,
 					"quoteChar": "\""
 				},
 				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Input')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/OutputCatalogue')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Input",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "CBM-AGY"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobStorageLocation",
+						"fileName": "Catalogue_Temp.csv",
+						"folderPath": "temp_catalogue",
+						"container": "main"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "InternalReference",
+						"type": "String"
+					},
+					{
+						"name": "ExternalReferance",
+						"type": "String"
+					},
+					{
+						"name": "Name",
+						"type": "String"
+					},
+					{
+						"name": "Description",
+						"type": "String"
+					},
+					{
+						"name": "ContentType",
+						"type": "String"
+					},
+					{
+						"name": "DisplayType",
+						"type": "String"
+					},
+					{
+						"name": "CreateOn",
+						"type": "String"
+					},
+					{
+						"name": "Priority",
+						"type": "String"
+					},
+					{
+						"name": "EnrolmentMode",
+						"type": "String"
+					},
+					{
+						"name": "EnrolmentCount",
+						"type": "String"
+					},
+					{
+						"name": "CPDLearningHours",
+						"type": "String"
+					},
+					{
+						"name": "CPDPoints",
+						"type": "String"
+					},
+					{
+						"name": "AccessCount",
+						"type": "String"
+					},
+					{
+						"name": "RatingMean",
+						"type": "String"
+					},
+					{
+						"name": "RatingCount",
+						"type": "String"
+					},
+					{
+						"name": "UpdateDate",
+						"type": "String"
+					},
+					{
+						"name": "FromFile",
+						"type": "String"
+					}
+				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Input')]"
@@ -1297,6 +2230,12 @@
 						"type": "datetime",
 						"precision": 23,
 						"scale": 3
+					},
+					{
+						"name": "FromFileDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
 					}
 				],
 				"typeProperties": {
@@ -1306,6 +2245,101 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/PomeloSQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sftpTest')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Sftp1",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"filename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "SftpLocation",
+						"fileName": {
+							"value": "@dataset().filename",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\"",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "STUD_ID",
+						"type": "String"
+					},
+					{
+						"name": "CPNT_TYP_ID",
+						"type": "String"
+					},
+					{
+						"name": "CPNT_ID",
+						"type": "String"
+					},
+					{
+						"name": "CMPL_STAT_ID",
+						"type": "String"
+					},
+					{
+						"name": "COMPL_DTE",
+						"type": "String"
+					},
+					{
+						"name": "COMPL_DTE_TIMEZONE",
+						"type": "String"
+					},
+					{
+						"name": "CREDIT_HRS",
+						"type": "String"
+					},
+					{
+						"name": "GRADE",
+						"type": "String"
+					},
+					{
+						"name": "INST_NAME",
+						"type": "String"
+					},
+					{
+						"name": "COMMENTS",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Sftp1')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SqlProd')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('SqlProd_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "integrationRuntime-self-linchee",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/integrationRuntime-self-linchee')]"
 			]
 		},
 		{
@@ -1577,158 +2611,6 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/CSVCatalogue')]",
 				"[concat(variables('factoryId'), '/datasets/SQLCatalogue')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/FlowCustomFieldToSQL')]",
-			"type": "Microsoft.DataFactory/factories/dataflows",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "MappingDataFlow",
-				"typeProperties": {
-					"sources": [
-						{
-							"dataset": {
-								"referenceName": "CSVCustomField",
-								"type": "DatasetReference"
-							},
-							"name": "CustomFieldData"
-						},
-						{
-							"dataset": {
-								"referenceName": "SQLCustomFieldCatalogue",
-								"type": "DatasetReference"
-							},
-							"name": "source1"
-						}
-					],
-					"sinks": [
-						{
-							"dataset": {
-								"referenceName": "SQLCustomFieldCatalogue",
-								"type": "DatasetReference"
-							},
-							"name": "sink1"
-						}
-					],
-					"transformations": [
-						{
-							"name": "UnpivotCustomFieldNameValuew"
-						},
-						{
-							"name": "AddUpdateDate"
-						},
-						{
-							"name": "AddSignatureNew"
-						},
-						{
-							"name": "AddSignatureExist"
-						},
-						{
-							"name": "FilterNotExist"
-						},
-						{
-							"name": "derivedColumn1"
-						}
-					],
-					"script": "source(output(\n\t\t{LearnignUnitCode (Internal CAP)} as string,\n\t\tLearningName as string,\n\t\tTraningId as string,\n\t\tEventNumberName as string,\n\t\tLastModifiedDate as string,\n\t\tTrainingCreatedDate as string,\n\t\tCreateByName as string,\n\t\tTrainingContact as string,\n\t\tTrainingHours as string,\n\t\tTrainingEmail as string,\n\t\tLearning10 as string,\n\t\tLearning20 as string,\n\t\tLearning70 as string,\n\t\tTrainingStartDate as string,\n\t\tTrainingEndDate as string,\n\t\tEventMinEnroll as string,\n\t\tEventMaxEnrolment as string,\n\t\tTrainingObjective as string,\n\t\tCostName as string,\n\t\tDemandRequire as string,\n\t\tPostAssessment as string,\n\t\tKnowledgeSkill as string,\n\t\tTrainnerName as string,\n\t\tInhousePublic as string,\n\t\tVendorSession as string,\n\t\tLocation as string,\n\t\tTrainingStatus as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> CustomFieldData\nsource(output(\n\t\tInternalReference as string,\n\t\tCustomFieldName as string,\n\t\tCustomFieldValue as string,\n\t\tUpdateDate as timestamp\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table') ~> source1\nCustomFieldData unpivot(output(\n\t\tCustomFieldName as string,\n\t\tCustomFieldValue as string\n\t),\n\tungroupBy({LearnignUnitCode (Internal CAP)},\n\t\tLearningName),\n\tlateral: false,\n\tignoreNullPivots: true) ~> UnpivotCustomFieldNameValuew\nFilterNotExist derive(UpdateDate = toTimestamp(202203011120, 'yyyy-MM-dd HH:mm')\r\n) ~> AddUpdateDate\nUnpivotCustomFieldNameValuew derive(Signature = sha2(256, {LearnignUnitCode (Internal CAP)} ,CustomFieldName,CustomFieldValue)) ~> AddSignatureNew\nsource1 derive(Signature = sha2(256, InternalReference,CustomFieldName,CustomFieldValue)) ~> AddSignatureExist\nderivedColumn1, AddSignatureExist exists(AddSignatureNew@Signature == AddSignatureExist@Signature,\n\tnegate:true,\n\tbroadcast: 'auto')~> FilterNotExist\nAddSignatureNew derive(Date = toTimestamp(concat(substring('CustomField202203051345.csv', 12, 4),'-',substring('CustomField202203051345', 16, 2),'-',substring('CustomField202203051345', 18, 2),' ',substring('CustomField202203051345', 20, 2),':',substring('CustomField202203051345', 22, 2),':'),'yyyy-MM-dd HH:mm')) ~> derivedColumn1\nAddUpdateDate sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\tInternalReference as string,\n\t\tCustomFieldName as string,\n\t\tCustomFieldValue as string,\n\t\tUpdateDate as timestamp\n\t),\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tmapColumn(\n\t\tInternalReference = {LearnignUnitCode (Internal CAP)},\n\t\tCustomFieldName,\n\t\tCustomFieldValue,\n\t\tUpdateDate\n\t)) ~> sink1"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/CSVCustomField')]",
-				"[concat(variables('factoryId'), '/datasets/SQLCustomFieldCatalogue')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/CustomFieldCSVToSQL')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "dataflow1",
-						"type": "ExecuteDataFlow",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "1.00:00:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"dataflow": {
-								"referenceName": "FlowCustomFieldToSQL",
-								"type": "DataFlowReference",
-								"parameters": {},
-								"datasetParameters": {
-									"CustomFieldData": {
-										"Filename": {
-											"value": "@pipeline().parameters.filename",
-											"type": "Expression"
-										}
-									},
-									"source1": {},
-									"sink1": {}
-								},
-								"linkedServiceParameters": {}
-							},
-							"staging": {},
-							"compute": {
-								"coreCount": 8,
-								"computeType": "General"
-							},
-							"traceLevel": "Fine"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {},
-					"cancelAfter": {}
-				},
-				"parameters": {
-					"filename": {
-						"type": "string"
-					}
-				},
-				"annotations": [],
-				"lastPublishTime": "2022-02-25T03:30:24Z"
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/dataflows/FlowCustomFieldToSQL')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/trigger1')]",
-			"type": "Microsoft.DataFactory/factories/triggers",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"runtimeState": "Started",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "CSVToSQL",
-							"type": "PipelineReference"
-						},
-						"parameters": {
-							"filename": "[parameters('trigger1_properties_CSVToSQL_parameters_filename')]"
-						}
-					}
-				],
-				"type": "BlobEventsTrigger",
-				"typeProperties": {
-					"blobPathBeginsWith": "/main/blobs/Catalogue",
-					"ignoreEmptyBlobs": true,
-					"scope": "[parameters('trigger1_properties_typeProperties_scope')]",
-					"events": [
-						"Microsoft.Storage.BlobCreated"
-					]
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/CSVToSQL')]"
 			]
 		}
 	]

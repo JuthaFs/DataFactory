@@ -1,0 +1,1804 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "BBTestDataFactory"
+		},
+		"Auto-onCreate_properties_CSVToSQL_parameters_filename": {
+			"type": "string",
+			"defaultValue": "@triggerBody().filename"
+		},
+		"Auto-onCreate_properties_CatalogueCSVToSQL_parameters_filename": {
+			"type": "string",
+			"defaultValue": "@triggerBody().filename"
+		},
+		"Auto-onCreate_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/d99b4590-2f3a-42b3-aa04-8c6ffbc7ecf2/resourceGroups/BBTestDataFactory/providers/Microsoft.Storage/storageAccounts/bbtestdatafactory2"
+		},
+		"trigger2_properties_CustomFieldCSVToSQL_parameters_filename": {
+			"type": "string",
+			"defaultValue": "@triggerBody().filename"
+		},
+		"trigger2_properties_typeProperties_scope": {
+			"type": "string",
+			"defaultValue": "/subscriptions/d99b4590-2f3a-42b3-aa04-8c6ffbc7ecf2/resourceGroups/BBTestDataFactory/providers/Microsoft.Storage/storageAccounts/bbtestdatafactory"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/SendCourseFileToSF_PTTEP')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "IfCheckHasData",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Set filename",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "queryCheckData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(equals(length(activity('queryCheckData').output.value), 0))",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "sendEmailFail",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"url": "https://prod-10.southeastasia.logic.azure.com:443/workflows/cd5050d5a16f498ab6d06f70f7323676/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=68IOE0MD0TSwEJkYKNTkyOpAeHtnejL63-9XOBsFamM",
+										"method": "POST",
+										"headers": {},
+										"body": {
+											"value": "{\n\"title\":\"Notify Learning Course\",\n\"message\":\"<p>There are no new versions of </p> <p>@{variables('filename')} uploaded to</p> <p>the SFTP site from BrighterBee.</p> \"\n}",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "sendEmailSuccess",
+									"type": "WebActivity",
+									"dependsOn": [
+										{
+											"activity": "Copy to internal",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"url": "https://prod-10.southeastasia.logic.azure.com:443/workflows/cd5050d5a16f498ab6d06f70f7323676/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=68IOE0MD0TSwEJkYKNTkyOpAeHtnejL63-9XOBsFamM",
+										"method": "POST",
+										"headers": {},
+										"body": {
+											"value": "{\n\"title\":\"Notify Learning Course\",\n\"message\":\"<p>a new version of</p> <p>@{variables('filename')} with @{activity('Copy to internal').output.rowsRead} record</p> <p>has successfully been uploaded to the SFTP site from BrighterBee.</p>\"\n}",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Copy to internal",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "PostgreSqlSource",
+											"query": {
+												"value": "@variables('query')",
+												"type": "Expression"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "SftpWriteSettings",
+												"operationTimeout": "01:00:00",
+												"useTempFileRename": true
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": {
+													"value": ".csv",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "CourseAction",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "sftpTest",
+											"type": "DatasetReference",
+											"parameters": {
+												"filename": {
+													"value": "@variables('filename')",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					},
+					{
+						"name": "Set filename",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "filename",
+							"value": {
+								"value": "@concat('item_data_PTTEP.csv.4')\n\n\n\n",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "queryCheckData",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Set query",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "PostgreSqlSource",
+								"query": {
+									"value": "@variables('query')",
+									"type": "Expression"
+								}
+							},
+							"dataset": {
+								"referenceName": "CourseAction",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Set query",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "query",
+							"value": {
+								"value": "select * from\n(select c.sku as \"CPNT_ID \" \n,'E-LEARNING' as \"CPNT_TYP_ID\"\n,case when c.\"updatedAt\" is null then c.\"createdAt\" else c.\"updatedAt\" end AS \"REV_DTE\"\n,'1001' as \"DMN_ID\"\n,case when c.status = 'published' then 'N' else 'Y' end as \"NOTACTIVE\"\n,c.title  as \"CPNT_TITLE\"\n,'101_201' as \"SUBJ_AREA_1\"\n,'INTERNAL' as \"CPNT_SRC_ID\"\n,c.\"totalTime\"/60/60 as \"CREDIT_HRS\"\n,null as \"COL_NUM2_VAL\"\n,null as \"LEVEL1_SURVEY\"\nfrom courses c \nwhere   c.sku like '%PTTEP%' and c.status != 'draft'\n) as t1\nwhere t1.\"REV_DTE\" > '@{formatDateTime(addDays(utcnow(), 1) ,'yyyy-MM-dd')}'",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"variables": {
+					"filename": {
+						"type": "String"
+					},
+					"query": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SendLearningHistoryFileToSF_PTTEP')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "IfCheckHasData",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Set filename",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "queryCheckData",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@not(equals(length(activity('queryCheckData').output.value), 0))",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "sendEmailFail",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"url": "https://prod-10.southeastasia.logic.azure.com:443/workflows/cd5050d5a16f498ab6d06f70f7323676/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=68IOE0MD0TSwEJkYKNTkyOpAeHtnejL63-9XOBsFamM",
+										"method": "POST",
+										"headers": {},
+										"body": {
+											"value": "{\n\"title\":\"Notify Learning History\",\n\"message\":\"<p>There are no new versions of </p> <p>@{variables('filename')} uploaded to</p> <p>the SFTP site from BrighterBee.</p> \"\n}",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "sendEmailSuccess",
+									"type": "WebActivity",
+									"dependsOn": [
+										{
+											"activity": "Copy to internal",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"url": "https://prod-10.southeastasia.logic.azure.com:443/workflows/cd5050d5a16f498ab6d06f70f7323676/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=68IOE0MD0TSwEJkYKNTkyOpAeHtnejL63-9XOBsFamM",
+										"method": "POST",
+										"headers": {},
+										"body": {
+											"value": "{\n\"title\":\"Notify Learning History\",\n\"message\":\"<p>a new version of</p> <p>@{variables('filename')} with @{activity('Copy to internal').output.rowsRead} record</p> <p>has successfully been uploaded to the SFTP site from BrighterBee.</p>\"\n}",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Copy to internal",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "PostgreSqlSource",
+											"query": {
+												"value": "@variables('query')",
+												"type": "Expression"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "SftpWriteSettings",
+												"operationTimeout": "01:00:00",
+												"useTempFileRename": true
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": {
+													"value": ".csv",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "CourseAction",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "sftpTest",
+											"type": "DatasetReference",
+											"parameters": {
+												"filename": {
+													"value": "@variables('filename')",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					},
+					{
+						"name": "Set filename",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "filename",
+							"value": {
+								"value": "@concat('learninghistory_data_PTTEP.csv.4')\n\n\n\n",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "queryCheckData",
+						"type": "Lookup",
+						"dependsOn": [
+							{
+								"activity": "Set query",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "PostgreSqlSource",
+								"query": {
+									"value": "@variables('query')",
+									"type": "Expression"
+								}
+							},
+							"dataset": {
+								"referenceName": "CourseAction",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					},
+					{
+						"name": "Set query",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "query",
+							"value": {
+								"value": "select * from  (select  u2.id AS \"STUD_ID\" ,'E-LEARNING' AS \"CPNT_TYP_ID\" ,c.sku as  \"CPNT_ID\" ,'E-LEARNING_COMPLETED' as \"CMPL_STAT_ID\" ,case when ca.\"updatedAt\" is null then ca.\"createdAt\" else ca.\"updatedAt\" end AS \"COMPL_DTE\" ,'Asia/Bangkok' as \"COMPL_DTE_TIMEZONE\" ,c.\"totalTime\"/60/60 as \"CREDIT_HRS\" ,max(qa.grade) as \"GRADE\" ,null AS \"INST_NAME\" ,null AS \"COMMENTS\" from \"courseActions\" ca  join courses c on c.id = ca.\"courseId\"  and c.status = 'published'  join topics t  on c.id = t.\"courseId\"  and t.title like 'Question%' join \"quizAttempts\" qa  on qa.\"topicId\" = t.id and qa.\"courseId\" = t.\"courseId\" and qa.\"userId\" = ca.\"userId\"  join users u2 on u2.id = ca.\"userId\"  where ca.\"userId\" = '28a8356f-b393-4c56-9ddb-308c5d6dc78c' and  ca.\"source\" = 'course_completed' group by (u2.id, ca.\"updatedAt\" ,ca.\"createdAt\",c.id ,t.id) ) t1 where t1.\"COMPL_DTE\" > '@{formatDateTime(addDays(utcnow(), 1) ,'yyyy-MM-dd')}'",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"variables": {
+					"filename": {
+						"type": "String"
+					},
+					"query": {
+						"type": "String"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CatalogueProd')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "SqlProd",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "CBM-AGY/Catalogue"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "InternalReference",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ExternalReferance",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Name",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Description",
+						"type": "nvarchar"
+					},
+					{
+						"name": "ContentType",
+						"type": "nvarchar"
+					},
+					{
+						"name": "DisplayType",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CreateOn",
+						"type": "nvarchar"
+					},
+					{
+						"name": "Priority",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EnrolmentMode",
+						"type": "nvarchar"
+					},
+					{
+						"name": "EnrolmentCount",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CPDLearningHours",
+						"type": "nvarchar"
+					},
+					{
+						"name": "CPDPoints",
+						"type": "nvarchar"
+					},
+					{
+						"name": "AccessCount",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RatingMean",
+						"type": "nvarchar"
+					},
+					{
+						"name": "RatingCount",
+						"type": "nvarchar"
+					},
+					{
+						"name": "UpdateDate",
+						"type": "datetime",
+						"precision": 23,
+						"scale": 3
+					},
+					{
+						"name": "FromFile",
+						"type": "nvarchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "CatalogueAgylia"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FlowCatalogueToSQL')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "CSVCatalogue",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						},
+						{
+							"dataset": {
+								"referenceName": "OutputCatalogue",
+								"type": "DatasetReference"
+							},
+							"name": "source2"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "OutputCatalogue",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DeleteOtherColumn"
+						},
+						{
+							"name": "Select1"
+						},
+						{
+							"name": "ExcludeExtrenalRefNULL"
+						},
+						{
+							"name": "filter1"
+						},
+						{
+							"name": "AddSinatureNew"
+						},
+						{
+							"name": "AddSignatureOld"
+						},
+						{
+							"name": "exists1"
+						},
+						{
+							"name": "derivedColumn1"
+						}
+					],
+					"scriptLines": [
+						"parameters{",
+						"     Filename as string",
+						"}",
+						"source(output(",
+						"          {Internal reference} as string,",
+						"          {External reference} as string,",
+						"          Name as string,",
+						"          Description as string,",
+						"          {Content Type} as string,",
+						"          {Display type} as string,",
+						"          {Created on} as string,",
+						"          Priority as string,",
+						"          {Enrolment mode} as string,",
+						"          {Enrolment count} as string,",
+						"          {CPD learning hours} as string,",
+						"          {CPD points} as string,",
+						"          {Access count} as string,",
+						"          {Rating mean} as string,",
+						"          {Rating count} as string,",
+						"          {Visibility:phone} as string,",
+						"          {Visibility:tablet} as string,",
+						"          {Visibility:portal} as string,",
+						"          Category18 as string,",
+						"          Category19 as string,",
+						"          Category20 as string,",
+						"          Category21 as string,",
+						"          Category22 as string,",
+						"          Category23 as string,",
+						"          Category24 as string,",
+						"          Category25 as string,",
+						"          Category26 as string,",
+						"          Category27 as string,",
+						"          Category28 as string,",
+						"          Category29 as string,",
+						"          Category30 as string,",
+						"          Category31 as string,",
+						"          Category32 as string,",
+						"          Category33 as string,",
+						"          Category34 as string,",
+						"          Category35 as string,",
+						"          Category36 as string,",
+						"          Category37 as string,",
+						"          Category38 as string,",
+						"          Category39 as string,",
+						"          Category40 as string,",
+						"          Category41 as string,",
+						"          Category42 as string,",
+						"          Category43 as string,",
+						"          Category44 as string,",
+						"          Category45 as string,",
+						"          Category46 as string,",
+						"          Category47 as string,",
+						"          Category48 as string,",
+						"          Category49 as string,",
+						"          Category50 as string,",
+						"          Category51 as string,",
+						"          Category52 as string,",
+						"          Category53 as string,",
+						"          Category54 as string,",
+						"          Category55 as string,",
+						"          Category56 as string,",
+						"          Category57 as string,",
+						"          Category58 as string,",
+						"          Category59 as string,",
+						"          Category60 as string,",
+						"          Category61 as string,",
+						"          Category62 as string,",
+						"          Category63 as string,",
+						"          Category64 as string,",
+						"          Category65 as string,",
+						"          Category66 as string,",
+						"          Category67 as string,",
+						"          Category68 as string,",
+						"          Category69 as string,",
+						"          Category70 as string,",
+						"          Category71 as string,",
+						"          Category72 as string,",
+						"          Category73 as string,",
+						"          Category74 as string,",
+						"          Category75 as string,",
+						"          Category76 as string,",
+						"          Category77 as string,",
+						"          Category78 as string,",
+						"          Category79 as string,",
+						"          Category80 as string,",
+						"          Category81 as string,",
+						"          Category82 as string,",
+						"          Category83 as string,",
+						"          Category84 as string,",
+						"          Category85 as string,",
+						"          Category86 as string,",
+						"          Category87 as string,",
+						"          Category88 as string,",
+						"          Category89 as string,",
+						"          Category90 as string,",
+						"          Category91 as string,",
+						"          Category92 as string,",
+						"          Category93 as string,",
+						"          Category94 as string,",
+						"          Category95 as string,",
+						"          Category96 as string,",
+						"          Category97 as string,",
+						"          Category98 as string,",
+						"          Category99 as string,",
+						"          Category100 as string,",
+						"          Category101 as string,",
+						"          Category102 as string,",
+						"          Category103 as string,",
+						"          Category104 as string,",
+						"          Category105 as string,",
+						"          Category106 as string,",
+						"          Category107 as string,",
+						"          Category108 as string,",
+						"          Category109 as string,",
+						"          Category110 as string,",
+						"          Category111 as string,",
+						"          Category112 as string,",
+						"          Category113 as string,",
+						"          Category114 as string,",
+						"          Category115 as string,",
+						"          Category116 as string,",
+						"          Category117 as string,",
+						"          Category118 as string,",
+						"          Category119 as string,",
+						"          Category120 as string,",
+						"          Category121 as string,",
+						"          Category122 as string,",
+						"          Category123 as string,",
+						"          Category124 as string,",
+						"          Category125 as string,",
+						"          Category126 as string,",
+						"          Category127 as string,",
+						"          Category128 as string,",
+						"          Category129 as string,",
+						"          Category130 as string,",
+						"          Category131 as string,",
+						"          Category132 as string,",
+						"          Category133 as string,",
+						"          Category134 as string,",
+						"          Category135 as string,",
+						"          Category136 as string,",
+						"          Category137 as string,",
+						"          Category138 as string,",
+						"          Category139 as string,",
+						"          Category140 as string,",
+						"          Category141 as string,",
+						"          Category142 as string,",
+						"          Category143 as string,",
+						"          Category144 as string,",
+						"          Category145 as string,",
+						"          Category146 as string,",
+						"          Category147 as string,",
+						"          {Catalogue:group148} as string,",
+						"          {Catalogue:group149} as string,",
+						"          {Catalogue:group150} as string,",
+						"          {Catalogue:group151} as string,",
+						"          {Catalogue:group152} as string,",
+						"          {Catalogue:group153} as string,",
+						"          {Catalogue:group154} as string,",
+						"          {Catalogue:group155} as string,",
+						"          {My learning:group156} as string,",
+						"          {My learning:group157} as string,",
+						"          {My learning:group158} as string,",
+						"          {My learning:group159} as string,",
+						"          {My learning:group160} as string,",
+						"          {My learning:group161} as string,",
+						"          {My learning:group162} as string,",
+						"          {My learning:group163} as string,",
+						"          {My learning:group164} as string,",
+						"          {My learning:group165} as string,",
+						"          {Catalogue:ou:business unit description (english)166} as string,",
+						"          {Catalogue:ou:business unit description (english)167} as string,",
+						"          {Catalogue:ou:business unit description (english)168} as string,",
+						"          {Catalogue:ou:business unit description (english)169} as string,",
+						"          {Catalogue:ou:business unit description (english)170} as string,",
+						"          {Catalogue:ou:business unit description (english)171} as string,",
+						"          {Catalogue:ou:business unit description (english)172} as string,",
+						"          {Catalogue:ou:business unit description (english)173} as string,",
+						"          {Catalogue:ou:business unit description (english)174} as string,",
+						"          {Catalogue:ou:business unit description (english)175} as string,",
+						"          {Catalogue:ou:business unit description (english)176} as string,",
+						"          {Catalogue:ou:business unit description (english)177} as string,",
+						"          {Catalogue:ou:business unit description (english)178} as string,",
+						"          {Catalogue:ou:business unit description (english)179} as string,",
+						"          {Catalogue:ou:business unit description (english)180} as string,",
+						"          {Catalogue:ou:business unit description (english)181} as string,",
+						"          {Catalogue:ou:business unit description (english)182} as string,",
+						"          {Catalogue:ou:business unit description (english)183} as string,",
+						"          {Catalogue:ou:business unit description (english)184} as string,",
+						"          {Catalogue:ou:business unit description (english)185} as string,",
+						"          {Catalogue:ou:business unit description (english)186} as string,",
+						"          {Catalogue:ou:business unit description (english)187} as string,",
+						"          {Catalogue:ou:business unit description (english)188} as string,",
+						"          {Catalogue:ou:business unit description (english)189} as string,",
+						"          {Catalogue:ou:business unit description (english)190} as string,",
+						"          {Catalogue:ou:business unit description (english)191} as string,",
+						"          {Catalogue:ou:business unit description (english)192} as string,",
+						"          {Catalogue:ou:business unit description (local)193} as string,",
+						"          {Catalogue:ou:business unit description (local)194} as string,",
+						"          {Catalogue:ou:business unit description (local)195} as string,",
+						"          {Catalogue:ou:business unit description (local)196} as string,",
+						"          {My learning:ou:business unit description (english)197} as string,",
+						"          {My learning:ou:business unit description (english)198} as string,",
+						"          {My learning:ou:business unit description (english)199} as string,",
+						"          {My learning:ou:business unit description (english)200} as string,",
+						"          {My learning:ou:business unit description (english)201} as string,",
+						"          {My learning:ou:business unit description (english)202} as string,",
+						"          {My learning:ou:business unit description (english)203} as string,",
+						"          {My learning:ou:business unit description (english)204} as string,",
+						"          {My learning:ou:business unit description (english)205} as string,",
+						"          {My learning:ou:business unit description (english)206} as string,",
+						"          {My learning:ou:business unit description (english)207} as string,",
+						"          {My learning:ou:business unit description (english)208} as string,",
+						"          {My learning:ou:business unit description (local)} as string",
+						"     ),",
+						"     allowSchemaDrift: false,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false,",
+						"     multiLineRow: true) ~> source1",
+						"source(output(",
+						"          InternalReference as string,",
+						"          ExternalReferance as string,",
+						"          Name as string,",
+						"          Description as string,",
+						"          ContentType as string,",
+						"          DisplayType as string,",
+						"          CreateOn as string,",
+						"          Priority as string,",
+						"          EnrolmentMode as string,",
+						"          EnrolmentCount as string,",
+						"          CPDLearningHours as string,",
+						"          CPDPoints as string,",
+						"          AccessCount as string,",
+						"          RatingMean as string,",
+						"          RatingCount as string,",
+						"          UpdateDate as string,",
+						"          FromFile as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: true,",
+						"     multiLineRow: true) ~> source2",
+						"source1 select(mapColumn(",
+						"          each(match(name=='Internal reference'||name=='External reference'||name=='Name'||name=='Description'||name=='Content Type'||name=='Display type'||name=='Created on'||name=='Priority'||name=='Created on'||name=='Priority'||name=='Enrolment mode'||name=='Enrolment count'||name=='CPD learning hours'||name=='CPD points'||name=='Access count'||name=='Rating mean'||name=='Rating count'))",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> DeleteOtherColumn",
+						"source2 select(mapColumn(",
+						"          each(match(name=='InternalReference'||name=='ExternalReferance'||name=='Name'||name=='Description'||name=='ContentType'||name=='DisplayType'||name=='CreateOn'||name=='Priority'||name=='EnrolmentMode'||name=='EnrolmentCount'||name=='CPDLearningHours'||name=='CPDPoints'||name=='AccessCount'||name=='RatingMean'||name=='RatingCount'))",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> Select1",
+						"DeleteOtherColumn filter(!isNull({External reference})) ~> ExcludeExtrenalRefNULL",
+						"Select1 filter(!isNull(ExternalReferance)) ~> filter1",
+						"ExcludeExtrenalRefNULL derive(SignatureNew = sha2(256,{Internal reference},{External reference},Name,Description,{Content Type},{Display type},{Created on},Priority,{Enrolment mode},{Enrolment count},{CPD learning hours},{CPD points},{Access count},{Rating mean},{Rating count})) ~> AddSinatureNew",
+						"filter1 derive(SignatureOld = sha2(256,InternalReference,ExternalReferance,Name,Description,ContentType,DisplayType,CreateOn,Priority,EnrolmentMode,EnrolmentCount,CPDLearningHours,CPDPoints,AccessCount,RatingMean,RatingCount)) ~> AddSignatureOld",
+						"AddSinatureNew, AddSignatureOld exists(SignatureNew == SignatureOld,",
+						"     negate:true,",
+						"     broadcast: 'auto')~> exists1",
+						"exists1 derive(UpdateDate = currentUTC(),",
+						"          FromFile = toString($Filename)) ~> derivedColumn1",
+						"derivedColumn1 sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          InternalReference as string,",
+						"          ExternalReferance as string,",
+						"          Name as string,",
+						"          Description as string,",
+						"          ContentType as string,",
+						"          DisplayType as string,",
+						"          CreateOn as string,",
+						"          Priority as string,",
+						"          EnrolmentMode as string,",
+						"          EnrolmentCount as string,",
+						"          CPDLearningHours as string,",
+						"          CPDPoints as string,",
+						"          AccessCount as string,",
+						"          RatingMean as string,",
+						"          RatingCount as string,",
+						"          UpdateDate as string,",
+						"          FromFile as string",
+						"     ),",
+						"     partitionFileNames:['Catalogue_Temp.csv'],",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     mapColumn(",
+						"          InternalReference = {Internal reference},",
+						"          ExternalReferance = {External reference},",
+						"          Name,",
+						"          Description,",
+						"          ContentType = {Content Type},",
+						"          DisplayType = {Display type},",
+						"          CreateOn = {Created on},",
+						"          Priority,",
+						"          EnrolmentMode = {Enrolment mode},",
+						"          EnrolmentCount = {Enrolment count},",
+						"          CPDLearningHours = {CPD learning hours},",
+						"          CPDPoints = {CPD points},",
+						"          AccessCount = {Access count},",
+						"          RatingMean = {Rating mean},",
+						"          RatingCount = {Rating count},",
+						"          UpdateDate,",
+						"          FromFile",
+						"     ),",
+						"     partitionBy('hash', 1)) ~> sink1"
+					]
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FlowCustomFieldToSQL')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "CSVCustomField",
+								"type": "DatasetReference"
+							},
+							"name": "CustomFieldData"
+						},
+						{
+							"dataset": {
+								"referenceName": "CSVDBCustomField",
+								"type": "DatasetReference"
+							},
+							"name": "source1"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "Output",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "UnpivotCustomFieldNameValuew"
+						},
+						{
+							"name": "AddUpdateDate"
+						},
+						{
+							"name": "AddSignatureNew"
+						},
+						{
+							"name": "AddSignatureExist"
+						},
+						{
+							"name": "FilterNotExist"
+						},
+						{
+							"name": "derivedColumn1"
+						},
+						{
+							"name": "AlterRow1"
+						}
+					],
+					"script": "parameters{\n\tFileNameDataFlow as string\n}\nsource(output(\n\t\t{LearnignUnitCode (Internal CAP)} as string,\n\t\tLearningName as string,\n\t\tTraningId as string,\n\t\tEventNumberName as string,\n\t\tLastModifiedDate as string,\n\t\tTrainingCreatedDate as string,\n\t\tCreateByName as string,\n\t\tTrainingContact as string,\n\t\tTrainingHours as string,\n\t\tTrainingEmail as string,\n\t\tLearning10 as string,\n\t\tLearning20 as string,\n\t\tLearning70 as string,\n\t\tTrainingStartDate as string,\n\t\tTrainingEndDate as string,\n\t\tEventMinEnroll as string,\n\t\tEventMaxEnrolment as string,\n\t\tTrainingObjective as string,\n\t\tCostName as string,\n\t\tDemandRequire as string,\n\t\tPostAssessment as string,\n\t\tKnowledgeSkill as string,\n\t\tTrainnerName as string,\n\t\tInhousePublic as string,\n\t\tVendorSession as string,\n\t\tLocation as string,\n\t\tTrainingStatus as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> CustomFieldData\nsource(output(\n\t\tLearningUnitCode as string,\n\t\tLearningUnitName as string,\n\t\tCustomFieldName as string,\n\t\tCustomFieldValue as string\n\t),\n\tallowSchemaDrift: false,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nCustomFieldData unpivot(output(\n\t\tCustomFieldName as string,\n\t\tCustomFieldValue as string\n\t),\n\tungroupBy({LearnignUnitCode (Internal CAP)},\n\t\tLearningName),\n\tlateral: false,\n\tignoreNullPivots: true) ~> UnpivotCustomFieldNameValuew\nFilterNotExist derive(UpdateDate = currentTimestamp()) ~> AddUpdateDate\nUnpivotCustomFieldNameValuew derive(Signature = sha2(256, {LearnignUnitCode (Internal CAP)} ,CustomFieldName,CustomFieldValue)) ~> AddSignatureNew\nsource1 derive(Signature = sha2(256, LearningUnitCode)) ~> AddSignatureExist\nderivedColumn1, AddSignatureExist exists(AddSignatureNew@Signature == AddSignatureExist@Signature,\n\tnegate:true,\n\tbroadcast: 'auto')~> FilterNotExist\nAddSignatureNew derive(Date = toTimestamp(\r\n    concat(\r\n        substring($FileNameDataFlow, 12, 4),'-',\r\n        substring($FileNameDataFlow, 16, 2),'-',\r\n        substring($FileNameDataFlow, 18, 2),' ',\r\n        substring($FileNameDataFlow, 20, 2),':',\r\n        substring($FileNameDataFlow, 22, 2),':'\r\n    )\r\n\r\n,'yyyy-MM-dd HH:mm')) ~> derivedColumn1\nAddUpdateDate alterRow(upsertIf(!isNull({LearnignUnitCode (Internal CAP)}))) ~> AlterRow1\nAlterRow1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tmapColumn(\n\t\tInternalReference = {LearnignUnitCode (Internal CAP)},\n\t\tCustomFieldName,\n\t\tCustomFieldValue,\n\t\tUpdateDate,\n\t\tFromFileDate = Date\n\t),\n\tformat: 'table') ~> sink1"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FlowCustomFieldToSQL_copy1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "CSVCustomField",
+								"type": "DatasetReference"
+							},
+							"name": "CustomFieldData"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "CSVCatalogue",
+								"type": "DatasetReference"
+							},
+							"name": "sink1"
+						}
+					],
+					"transformations": [
+						{
+							"name": "UnpivotCustomFieldNameValuew"
+						},
+						{
+							"name": "AddUpdateDate"
+						},
+						{
+							"name": "derivedColumn1"
+						}
+					],
+					"script": "parameters{\n\tFileNameDataFlow as string\n}\nsource(output(\n\t\t{LearnignUnitCode (Internal CAP)} as string,\n\t\tLearningName as string,\n\t\tTraningId as string,\n\t\tEventNumberName as string,\n\t\tLastModifiedDate as string,\n\t\tTrainingCreatedDate as string,\n\t\tCreateByName as string,\n\t\tTrainingContact as string,\n\t\tTrainingHours as string,\n\t\tTrainingEmail as string,\n\t\tLearning10 as string,\n\t\tLearning20 as string,\n\t\tLearning70 as string,\n\t\tTrainingStartDate as string,\n\t\tTrainingEndDate as string,\n\t\tEventMinEnroll as string,\n\t\tEventMaxEnrolment as string,\n\t\tTrainingObjective as string,\n\t\tCostName as string,\n\t\tDemandRequire as string,\n\t\tPostAssessment as string,\n\t\tKnowledgeSkill as string,\n\t\tTrainnerName as string,\n\t\tInhousePublic as string,\n\t\tVendorSession as string,\n\t\tLocation as string,\n\t\tTrainingStatus as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> CustomFieldData\nCustomFieldData unpivot(output(\n\t\tCustomFieldName as string,\n\t\tCustomFieldValue as string\n\t),\n\tungroupBy({LearnignUnitCode (Internal CAP)},\n\t\tLearningName),\n\tlateral: false,\n\tignoreNullPivots: true) ~> UnpivotCustomFieldNameValuew\nderivedColumn1 derive(UpdateDate = currentTimestamp()) ~> AddUpdateDate\nUnpivotCustomFieldNameValuew derive(Date = toTimestamp(\r\n    concat(\r\n        /*substring(toString(year(currentDate())),1,2),*/\r\n        substring('CustomField202203011345.csv', 12, 4),'-',\r\n        substring('CustomField202203011345.csv', 16, 2),'-',\r\n        substring('CustomField202203011345.csv', 18, 2),' ',\r\n        substring('CustomField202203011345.csv', 20, 2),':',\r\n        substring('CustomField202203011345.csv', 22, 2)\r\n    )\r\n\r\n,'yyyy-MM-dd HH:mm')) ~> derivedColumn1\nAddUpdateDate sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tinput(\n\t\t{Internal reference} as string,\n\t\t{External reference} as string,\n\t\tName as string,\n\t\tDescription as string,\n\t\t{Content Type} as string,\n\t\t{Display type} as string,\n\t\t{Created on} as string,\n\t\tPriority as string,\n\t\t{Enrolment mode} as string,\n\t\t{Enrolment count} as string,\n\t\t{CPD learning hours} as string,\n\t\t{CPD points} as string,\n\t\t{Access count} as string,\n\t\t{Rating mean} as string,\n\t\t{Rating count} as string,\n\t\t{Visibility:phone} as string,\n\t\t{Visibility:tablet} as string,\n\t\t{Visibility:portal} as string,\n\t\tCategory18 as string,\n\t\tCategory19 as string,\n\t\tCategory20 as string,\n\t\tCategory21 as string,\n\t\tCategory22 as string,\n\t\tCategory23 as string,\n\t\tCategory24 as string,\n\t\tCategory25 as string,\n\t\tCategory26 as string,\n\t\tCategory27 as string,\n\t\tCategory28 as string,\n\t\tCategory29 as string,\n\t\tCategory30 as string,\n\t\tCategory31 as string,\n\t\tCategory32 as string,\n\t\tCategory33 as string,\n\t\tCategory34 as string,\n\t\tCategory35 as string,\n\t\tCategory36 as string,\n\t\tCategory37 as string,\n\t\tCategory38 as string,\n\t\tCategory39 as string,\n\t\tCategory40 as string,\n\t\tCategory41 as string,\n\t\tCategory42 as string,\n\t\tCategory43 as string,\n\t\tCategory44 as string,\n\t\tCategory45 as string,\n\t\tCategory46 as string,\n\t\tCategory47 as string,\n\t\tCategory48 as string,\n\t\tCategory49 as string,\n\t\tCategory50 as string,\n\t\tCategory51 as string,\n\t\tCategory52 as string,\n\t\tCategory53 as string,\n\t\tCategory54 as string,\n\t\tCategory55 as string,\n\t\tCategory56 as string,\n\t\tCategory57 as string,\n\t\tCategory58 as string,\n\t\tCategory59 as string,\n\t\tCategory60 as string,\n\t\tCategory61 as string,\n\t\tCategory62 as string,\n\t\tCategory63 as string,\n\t\tCategory64 as string,\n\t\tCategory65 as string,\n\t\tCategory66 as string,\n\t\tCategory67 as string,\n\t\tCategory68 as string,\n\t\tCategory69 as string,\n\t\tCategory70 as string,\n\t\tCategory71 as string,\n\t\tCategory72 as string,\n\t\tCategory73 as string,\n\t\tCategory74 as string,\n\t\tCategory75 as string,\n\t\tCategory76 as string,\n\t\tCategory77 as string,\n\t\tCategory78 as string,\n\t\tCategory79 as string,\n\t\tCategory80 as string,\n\t\tCategory81 as string,\n\t\tCategory82 as string,\n\t\tCategory83 as string,\n\t\tCategory84 as string,\n\t\tCategory85 as string,\n\t\tCategory86 as string,\n\t\tCategory87 as string,\n\t\tCategory88 as string,\n\t\tCategory89 as string,\n\t\tCategory90 as string,\n\t\tCategory91 as string,\n\t\tCategory92 as string,\n\t\tCategory93 as string,\n\t\tCategory94 as string,\n\t\tCategory95 as string,\n\t\tCategory96 as string,\n\t\tCategory97 as string,\n\t\tCategory98 as string,\n\t\tCategory99 as string,\n\t\tCategory100 as string,\n\t\tCategory101 as string,\n\t\tCategory102 as string,\n\t\tCategory103 as string,\n\t\tCategory104 as string,\n\t\tCategory105 as string,\n\t\tCategory106 as string,\n\t\tCategory107 as string,\n\t\tCategory108 as string,\n\t\tCategory109 as string,\n\t\tCategory110 as string,\n\t\tCategory111 as string,\n\t\tCategory112 as string,\n\t\tCategory113 as string,\n\t\tCategory114 as string,\n\t\tCategory115 as string,\n\t\tCategory116 as string,\n\t\tCategory117 as string,\n\t\tCategory118 as string,\n\t\tCategory119 as string,\n\t\tCategory120 as string,\n\t\tCategory121 as string,\n\t\tCategory122 as string,\n\t\tCategory123 as string,\n\t\tCategory124 as string,\n\t\tCategory125 as string,\n\t\tCategory126 as string,\n\t\tCategory127 as string,\n\t\tCategory128 as string,\n\t\tCategory129 as string,\n\t\tCategory130 as string,\n\t\tCategory131 as string,\n\t\tCategory132 as string,\n\t\tCategory133 as string,\n\t\tCategory134 as string,\n\t\tCategory135 as string,\n\t\tCategory136 as string,\n\t\tCategory137 as string,\n\t\tCategory138 as string,\n\t\tCategory139 as string,\n\t\tCategory140 as string,\n\t\tCategory141 as string,\n\t\tCategory142 as string,\n\t\tCategory143 as string,\n\t\tCategory144 as string,\n\t\tCategory145 as string,\n\t\tCategory146 as string,\n\t\tCategory147 as string,\n\t\t{Catalogue:group148} as string,\n\t\t{Catalogue:group149} as string,\n\t\t{Catalogue:group150} as string,\n\t\t{Catalogue:group151} as string,\n\t\t{Catalogue:group152} as string,\n\t\t{Catalogue:group153} as string,\n\t\t{Catalogue:group154} as string,\n\t\t{Catalogue:group155} as string,\n\t\t{My learning:group156} as string,\n\t\t{My learning:group157} as string,\n\t\t{My learning:group158} as string,\n\t\t{My learning:group159} as string,\n\t\t{My learning:group160} as string,\n\t\t{My learning:group161} as string,\n\t\t{My learning:group162} as string,\n\t\t{My learning:group163} as string,\n\t\t{My learning:group164} as string,\n\t\t{My learning:group165} as string,\n\t\t{Catalogue:ou:business unit description (english)166} as string,\n\t\t{Catalogue:ou:business unit description (english)167} as string,\n\t\t{Catalogue:ou:business unit description (english)168} as string,\n\t\t{Catalogue:ou:business unit description (english)169} as string,\n\t\t{Catalogue:ou:business unit description (english)170} as string,\n\t\t{Catalogue:ou:business unit description (english)171} as string,\n\t\t{Catalogue:ou:business unit description (english)172} as string,\n\t\t{Catalogue:ou:business unit description (english)173} as string,\n\t\t{Catalogue:ou:business unit description (english)174} as string,\n\t\t{Catalogue:ou:business unit description (english)175} as string,\n\t\t{Catalogue:ou:business unit description (english)176} as string,\n\t\t{Catalogue:ou:business unit description (english)177} as string,\n\t\t{Catalogue:ou:business unit description (english)178} as string,\n\t\t{Catalogue:ou:business unit description (english)179} as string,\n\t\t{Catalogue:ou:business unit description (english)180} as string,\n\t\t{Catalogue:ou:business unit description (english)181} as string,\n\t\t{Catalogue:ou:business unit description (english)182} as string,\n\t\t{Catalogue:ou:business unit description (english)183} as string,\n\t\t{Catalogue:ou:business unit description (english)184} as string,\n\t\t{Catalogue:ou:business unit description (english)185} as string,\n\t\t{Catalogue:ou:business unit description (english)186} as string,\n\t\t{Catalogue:ou:business unit description (english)187} as string,\n\t\t{Catalogue:ou:business unit description (english)188} as string,\n\t\t{Catalogue:ou:business unit description (english)189} as string,\n\t\t{Catalogue:ou:business unit description (english)190} as string,\n\t\t{Catalogue:ou:business unit description (english)191} as string,\n\t\t{Catalogue:ou:business unit description (english)192} as string,\n\t\t{Catalogue:ou:business unit description (local)193} as string,\n\t\t{Catalogue:ou:business unit description (local)194} as string,\n\t\t{Catalogue:ou:business unit description (local)195} as string,\n\t\t{Catalogue:ou:business unit description (local)196} as string,\n\t\t{My learning:ou:business unit description (english)197} as string,\n\t\t{My learning:ou:business unit description (english)198} as string,\n\t\t{My learning:ou:business unit description (english)199} as string,\n\t\t{My learning:ou:business unit description (english)200} as string,\n\t\t{My learning:ou:business unit description (english)201} as string,\n\t\t{My learning:ou:business unit description (english)202} as string,\n\t\t{My learning:ou:business unit description (english)203} as string,\n\t\t{My learning:ou:business unit description (english)204} as string,\n\t\t{My learning:ou:business unit description (english)205} as string,\n\t\t{My learning:ou:business unit description (english)206} as string,\n\t\t{My learning:ou:business unit description (english)207} as string,\n\t\t{My learning:ou:business unit description (english)208} as string,\n\t\t{My learning:ou:business unit description (local)} as string\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tformat: 'table') ~> sink1"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CatalogueCSVToSQL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Flowcsv",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [
+							{
+								"activity": "Copy data2",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "FlowCatalogueToSQL",
+								"type": "DataFlowReference",
+								"parameters": {
+									"Filename": {
+										"value": "'@{pipeline().parameters.filename}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"source1": {
+										"filename": {
+											"value": "@pipeline().parameters.filename",
+											"type": "Expression"
+										}
+									},
+									"source2": {},
+									"sink1": {}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime1",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					},
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Flowcsv",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobStorageReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "SqlServerSink",
+								"writeBehavior": "upsert",
+								"upsertSettings": {
+									"useTempDB": true,
+									"keys": [
+										"InternalReference",
+										"ExternalReferance"
+									]
+								},
+								"sqlWriterUseTableLock": false
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "InternalReference",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "InternalReference",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ExternalReferance",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "ExternalReferance",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Name",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Description",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Description",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "ContentType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "ContentType",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "DisplayType",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "DisplayType",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CreateOn",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CreateOn",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "Priority",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "Priority",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "EnrolmentMode",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "EnrolmentMode",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "EnrolmentCount",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "EnrolmentCount",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CPDLearningHours",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CPDLearningHours",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "CPDPoints",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "CPDPoints",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "AccessCount",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "AccessCount",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "RatingMean",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "RatingMean",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "RatingCount",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "RatingCount",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									},
+									{
+										"source": {
+											"name": "UpdateDate",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "UpdateDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										}
+									},
+									{
+										"source": {
+											"name": "FromFile",
+											"type": "String",
+											"physicalType": "String"
+										},
+										"sink": {
+											"name": "FromFile",
+											"type": "String",
+											"physicalType": "nvarchar"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "OutputCatalogue",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "CatalogueProd",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Copy data2",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "InternalReference",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "InternalReference",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ExternalReferance",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "ExternalReferance",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Name",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "Name",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Description",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "Description",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "ContentType",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "ContentType",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "DisplayType",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "DisplayType",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "CreateOn",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "CreateOn",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "Priority",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "Priority",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "EnrolmentMode",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "EnrolmentMode",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "EnrolmentCount",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "EnrolmentCount",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "CPDLearningHours",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "CPDLearningHours",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "CPDPoints",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "CPDPoints",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "AccessCount",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "AccessCount",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "RatingMean",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "RatingMean",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "RatingCount",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "RatingCount",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "UpdateDate",
+											"type": "DateTime",
+											"physicalType": "datetime"
+										},
+										"sink": {
+											"name": "UpdateDate",
+											"type": "String",
+											"physicalType": "String"
+										}
+									},
+									{
+										"source": {
+											"name": "FromFile",
+											"type": "String",
+											"physicalType": "nvarchar"
+										},
+										"sink": {
+											"name": "FromFile",
+											"type": "String",
+											"physicalType": "String"
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "CatalogueProd",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "OutputCatalogue",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"filename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-02-25T03:30:24Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/FlowCatalogueToSQL')]",
+				"[concat(variables('factoryId'), '/datasets/CatalogueProd')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomFieldCSVToSQL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "FlowCustomFieldToSQL",
+								"type": "DataFlowReference",
+								"parameters": {
+									"FileNameDataFlow": {
+										"value": "'@{pipeline().parameters.filename}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"CustomFieldData": {
+										"Filename": {
+											"value": "@pipeline().parameters.filename",
+											"type": "Expression"
+										}
+									},
+									"source1": {},
+									"sink1": {
+										"Filename": "@pipeline().parameters.filename"
+									}
+								}
+							},
+							"staging": {},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntime1",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"filename": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2022-02-25T03:30:24Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/FlowCustomFieldToSQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Auto-onCreate')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "CSVToSQL",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"filename": "[parameters('Auto-onCreate_properties_CSVToSQL_parameters_filename')]"
+						}
+					},
+					{
+						"pipelineReference": {
+							"referenceName": "CatalogueCSVToSQL",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"filename": "[parameters('Auto-onCreate_properties_CatalogueCSVToSQL_parameters_filename')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/main/blobs/testsftp/Catalogue",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('Auto-onCreate_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/CatalogueCSVToSQL')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trigger2')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Stopped",
+				"pipelines": [
+					{
+						"pipelineReference": {
+							"referenceName": "CustomFieldCSVToSQL",
+							"type": "PipelineReference"
+						},
+						"parameters": {
+							"filename": "[parameters('trigger2_properties_CustomFieldCSVToSQL_parameters_filename')]"
+						}
+					}
+				],
+				"type": "BlobEventsTrigger",
+				"typeProperties": {
+					"blobPathBeginsWith": "/main/blobs/CustomField",
+					"ignoreEmptyBlobs": true,
+					"scope": "[parameters('trigger2_properties_typeProperties_scope')]",
+					"events": [
+						"Microsoft.Storage.BlobCreated"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/CustomFieldCSVToSQL')]"
+			]
+		}
+	]
+}
