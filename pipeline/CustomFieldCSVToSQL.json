@@ -30,6 +30,9 @@
 									"value": "@pipeline().parameters.filename",
 									"type": "Expression"
 								}
+							},
+							"sink1": {
+								"Filename": "@pipeline().parameters.filename"
 							}
 						}
 					},
