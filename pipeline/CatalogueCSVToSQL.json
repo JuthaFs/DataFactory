@@ -5,7 +5,14 @@
 			{
 				"name": "Flowcsv",
 				"type": "ExecuteDataFlow",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "Copy data2",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "1.00:00:00",
 					"retry": 0,
@@ -75,7 +82,7 @@
 						"type": "SqlServerSink",
 						"writeBehavior": "upsert",
 						"upsertSettings": {
-							"useTempDB": false,
+							"useTempDB": true,
 							"keys": [
 								"InternalReference",
 								"ExternalReferance"
@@ -89,7 +96,7 @@
 						"mappings": [
 							{
 								"source": {
-									"name": "Internal reference",
+									"name": "InternalReference",
 									"type": "String",
 									"physicalType": "String"
 								},
@@ -101,7 +108,7 @@
 							},
 							{
 								"source": {
-									"name": "External reference",
+									"name": "ExternalReferance",
 									"type": "String",
 									"physicalType": "String"
 								},
@@ -137,7 +144,7 @@
 							},
 							{
 								"source": {
-									"name": "Content Type",
+									"name": "ContentType",
 									"type": "String",
 									"physicalType": "String"
 								},
@@ -149,7 +156,7 @@
 							},
 							{
 								"source": {
-									"name": "Display type",
+									"name": "DisplayType",
 									"type": "String",
 									"physicalType": "String"
 								},
@@ -161,7 +168,7 @@
 							},
 							{
 								"source": {
-									"name": "Created on",
+									"name": "CreateOn",
 									"type": "String",
 									"physicalType": "String"
 								},
@@ -185,7 +192,7 @@
 							},
 							{
 								"source": {
-									"name": "Enrolment mode",
+									"name": "EnrolmentMode",
 									"type": "String",
 									"physicalType": "String"
 								},
@@ -197,7 +204,7 @@
 							},
 							{
 								"source": {
-									"name": "Enrolment count",
+									"name": "EnrolmentCount",
 									"type": "String",
 									"physicalType": "String"
 								},
@@ -209,7 +216,7 @@
 							},
 							{
 								"source": {
-									"name": "CPD learning hours",
+									"name": "CPDLearningHours",
 									"type": "String",
 									"physicalType": "String"
 								},
@@ -221,7 +228,7 @@
 							},
 							{
 								"source": {
-									"name": "CPD points",
+									"name": "CPDPoints",
 									"type": "String",
 									"physicalType": "String"
 								},
@@ -233,7 +240,7 @@
 							},
 							{
 								"source": {
-									"name": "Access count",
+									"name": "AccessCount",
 									"type": "String",
 									"physicalType": "String"
 								},
@@ -245,7 +252,7 @@
 							},
 							{
 								"source": {
-									"name": "Rating mean",
+									"name": "RatingMean",
 									"type": "String",
 									"physicalType": "String"
 								},
@@ -257,7 +264,7 @@
 							},
 							{
 								"source": {
-									"name": "Rating count",
+									"name": "RatingCount",
 									"type": "String",
 									"physicalType": "String"
 								},
@@ -308,6 +315,264 @@
 				"outputs": [
 					{
 						"referenceName": "CatalogueProd",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "Copy data2",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "SqlServerSource",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobStorageWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"mappings": [
+							{
+								"source": {
+									"name": "InternalReference",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "InternalReference",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ExternalReferance",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "ExternalReferance",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Name",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "Name",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Description",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "Description",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "ContentType",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "ContentType",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "DisplayType",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "DisplayType",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "CreateOn",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "CreateOn",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Priority",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "Priority",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "EnrolmentMode",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "EnrolmentMode",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "EnrolmentCount",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "EnrolmentCount",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "CPDLearningHours",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "CPDLearningHours",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "CPDPoints",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "CPDPoints",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "AccessCount",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "AccessCount",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RatingMean",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "RatingMean",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "RatingCount",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "RatingCount",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "UpdateDate",
+									"type": "DateTime",
+									"physicalType": "datetime"
+								},
+								"sink": {
+									"name": "UpdateDate",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "FromFile",
+									"type": "String",
+									"physicalType": "nvarchar"
+								},
+								"sink": {
+									"name": "FromFile",
+									"type": "String",
+									"physicalType": "String"
+								}
+							}
+						],
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "CatalogueProd",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "OutputCatalogue",
 						"type": "DatasetReference"
 					}
 				]

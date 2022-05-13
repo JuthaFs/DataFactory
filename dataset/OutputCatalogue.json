@@ -24,11 +24,11 @@
 		},
 		"schema": [
 			{
-				"name": "Internal reference",
+				"name": "InternalReference",
 				"type": "String"
 			},
 			{
-				"name": "External reference",
+				"name": "ExternalReferance",
 				"type": "String"
 			},
 			{
@@ -40,15 +40,15 @@
 				"type": "String"
 			},
 			{
-				"name": "Content Type",
+				"name": "ContentType",
 				"type": "String"
 			},
 			{
-				"name": "Display type",
+				"name": "DisplayType",
 				"type": "String"
 			},
 			{
-				"name": "Created on",
+				"name": "CreateOn",
 				"type": "String"
 			},
 			{
@@ -56,31 +56,31 @@
 				"type": "String"
 			},
 			{
-				"name": "Enrolment mode",
+				"name": "EnrolmentMode",
 				"type": "String"
 			},
 			{
-				"name": "Enrolment count",
+				"name": "EnrolmentCount",
 				"type": "String"
 			},
 			{
-				"name": "CPD learning hours",
+				"name": "CPDLearningHours",
 				"type": "String"
 			},
 			{
-				"name": "CPD points",
+				"name": "CPDPoints",
 				"type": "String"
 			},
 			{
-				"name": "Access count",
+				"name": "AccessCount",
 				"type": "String"
 			},
 			{
-				"name": "Rating mean",
+				"name": "RatingMean",
 				"type": "String"
 			},
 			{
-				"name": "Rating count",
+				"name": "RatingCount",
 				"type": "String"
 			},
 			{
