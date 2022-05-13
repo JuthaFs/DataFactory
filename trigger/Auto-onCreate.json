@@ -6,15 +6,6 @@
 		"pipelines": [
 			{
 				"pipelineReference": {
-					"referenceName": "CSVToSQL",
-					"type": "PipelineReference"
-				},
-				"parameters": {
-					"filename": "@triggerBody().filename"
-				}
-			},
-			{
-				"pipelineReference": {
 					"referenceName": "CatalogueCSVToSQL",
 					"type": "PipelineReference"
 				},
