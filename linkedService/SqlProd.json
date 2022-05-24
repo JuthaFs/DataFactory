@@ -6,10 +6,10 @@
 		"type": "SqlServer",
 		"typeProperties": {
 			"connectionString": "integrated security=False;data source=bbsqlinstance.3c2484c05c67.database.windows.net;initial catalog=Data_TankCBM;user id=AzureSQLAdmin",
-			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJmYmY4NTg1Mi04MDE0LTQwNTgtOGMxZS1jZjRjY2I0ODIxYTIiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDlERTIxQTFFLTQ1MkYtNEZCOS04MUYxLTU4QTJEOUQzMTJDN18xZmVjMGNhYS1mNDRlLTQ4ZTYtYTgzMy1lM2QyNTEyNjZiZmIiDQp9"
 		},
 		"connectVia": {
-			"referenceName": "integrationRuntime-self-linchee",
+			"referenceName": "AutoResolveIntegrationRuntime",
 			"type": "IntegrationRuntimeReference"
 		}
 	}
