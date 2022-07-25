@@ -16,7 +16,7 @@
 		],
 		"type": "BlobEventsTrigger",
 		"typeProperties": {
-			"blobPathBeginsWith": "/main/blobs/testsftp/Catalogue",
+			"blobPathBeginsWith": "/main/blobs/testsftp/",
 			"ignoreEmptyBlobs": true,
 			"scope": "/subscriptions/d99b4590-2f3a-42b3-aa04-8c6ffbc7ecf2/resourceGroups/BBTestDataFactory/providers/Microsoft.Storage/storageAccounts/bbtestdatafactory2",
 			"events": [
